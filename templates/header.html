@@ -14,9 +14,9 @@
 
 <header>
         <h1>Vareflyt<small> Eviate </small></h1>
-        <p>{{ active1 }}</p>
 </header>
 
+<div id="nav">
 <nav class="navbar navbar-inverse">
   <div class="container-fluid">
     <ul class="nav navbar-nav">
@@ -25,16 +25,21 @@
     {% else %}
       <li>
     {% endif %}
-      <a href="{{url_for('index')}}"> OVERSIKT </a></li>
-    {% if switch.active2 == '1' %}
-      <li class="active">
-    {% else %}
-      <li>
-    {% endif %}  
-    <a href="{{url_for('ordreform')}}"> NY ORDRE </a></li> 
+      <a href="{{url_for('index')}}"> ORDRELISTE </a></li>
+      <li> <a href="#"> VARELISTE </a></li>
+      <li> <a href="#"> KUNDELISTE </a></li> 
+      <li> <a href="#"> LEVERANDØRER </a></li>    
+
+      <li> <a href="{{url_for('ordreform')}}"> NY ORDRE </a></li> 
+      <li> <a href="#"> NY VARE </a> </li>
+      <li> <a href="#"> NY KUNDE </a> </li>
+      <li> <a href="#"> NY LEVERANDØR </a></li> 
+    
+   
     </ul>
   </div>
 </nav>
+</div>
       
       
 

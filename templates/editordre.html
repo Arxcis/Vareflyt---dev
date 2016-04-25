@@ -1,0 +1,182 @@
+{% include 'header.html' %}
+
+<form class="form-horizontal" action="{{url_for('update_ordre')}}" method="post">
+  <fieldset>
+
+    <!-- Form Name -->
+    <legend>Edit butikkinfo</legend>
+
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="varenavn">ID</label>  
+      <div class="col-md-5">
+      <input id="textinput" name="ID" type="text" placeholder="ID" class="form-control input-md" required="" value='{{ ordre[0] }}'>
+        
+      </div>
+    </div>
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="varenavn">Varenavn</label>  
+      <div class="col-md-5">
+      <input id="textinput" name="varenavn" type="text" placeholder="Sok" class="form-control input-md" required="" value='{{ ordre[1] }}'>
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="vareID">VareID</label>  
+      <div class="col-md-4">
+      <input id="textinput" name="vareID" type="text" placeholder="7 siffer" class="form-control input-md" value="{{ ordre[2] }}">
+        
+      </div>
+    </div>
+
+    <!-- Select Basic -->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="selectbasic">Antall</label>
+      <div class="col-md-2">
+        <select id="selectbasic" name="vareantall" class="form-control" value="{{ ordre[3] }}">
+          <option {% if ordre[3] == '1'%}selected {% endif %}value="1">1</option>
+          <option {% if ordre[3] == '2'%}selected {% endif %}value="2">2</option>
+          <option {% if ordre[3] == '3'%}selected {% endif %}value="3">3</option>
+          <option {% if ordre[3] == '4'%}selected {% endif %}value="4">4</option>
+          <option {% if ordre[3] == '5'%}selected {% endif %}value="5">5</option>
+          <option {% if ordre[3] == '6'%}selected {% endif %}value="6">6</option>
+          <option {% if ordre[3] == '7'%}selected {% endif %}value="7">7</option>
+          <option {% if ordre[3] == '8'%}selected {% endif %}value="8">8</option>
+          <option {% if ordre[3] == '9'%}selected {% endif %}value="9">9</option>
+          <option {% if ordre[3] == '10'%}selected {% endif %}value="10">10</option>
+        </select>
+      </div>
+    </div>
+
+
+    </br>
+    </br>
+
+    <!-- Search input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">Kundenavn</label>  
+      <div class="col-md-5">
+      <input id="textinput" name="kundenavn" type="text" placeholder="Sok" class="form-control input-md" required="" value="{{ ordre[4]}}">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">KundeID</label>  
+      <div class="col-md-4">
+      <input id="textinput" name="kundeID" type="text" placeholder="7 siffer" class="form-control input-md" value="{{ ordre[5]}}">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">Telefon</label>  
+      <div class="col-md-4">
+      <input id="textinput" name="kundetelefon" type="text" placeholder="8 siffer" class="form-control input-md" required="" value="{{ ordre[6]}}">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">E-post</label>  
+      <div class="col-md-4">
+      <input id="textinput" name="kundemail" type="text" class="form-control input-md"
+        value="{{ ordre[7]}}">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">Adresse</label>  
+      <div class="col-md-5">
+      <input id="textinput" name="kundeadresse" type="text" placeholder="Gateadresse" class="form-control input-md" value="{{ ordre[8]}}">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput"></label>  
+      <div class="col-md-2">
+      <input id="textinput" name="kundepostboks" type="text" placeholder="Postnummer" class="form-control input-md" value="{{ ordre[9]}}">
+        
+      </div>
+    </div>
+
+  </fieldset>
+
+  </br>
+
+  <legend>Edit admin info</legend>
+  <fieldset>
+      <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">Leverandor</label>  
+      <div class="col-md-5">
+      <input id="textinput" name="levnavn" type="text" placeholder="Navn" class="form-control input-md" required="" value="{{ ordre[10]}}">
+        
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">LevID</label>  
+      <div class="col-md-4">
+      <input id="textinput" name="levID" type="text" placeholder="7 siffer" class="form-control input-md" value="{{ ordre[11]}}">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">Telefon</label>  
+      <div class="col-md-4">
+      <input id="textinput" name="levtelefon" type="text" placeholder="8 siffer" class="form-control input-md" value="{{ ordre[12]}}">
+        
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">E-post</label>  
+      <div class="col-md-4">
+      <input id="textinput" name="levmail" type="text" placeholder="8 siffer" class="form-control input-md" value="{{ ordre[13]}}">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">Adresse</label>  
+      <div class="col-md-5">
+      <input id="textinput" name="levadresse" type="text" placeholder="Gateadresse" class="form-control input-md" value="{{ ordre[14]}}">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput"></label>  
+      <div class="col-md-2">
+      <input id="textinput" name="levpostboks" type="text" placeholder="Postnummer" class="form-control input-md" value="{{ ordre[15]}}">
+        
+      </div>
+    </div>
+
+  </fieldset>
+
+  <!--Submit-button -->
+  <div class="form-group">
+      <div class="col-md-4">
+        <input type="submit" name="submit" value="Submit" class="btn btn-success">
+      </div>
+    </div>
+
+</form>
+
+
+{% include 'footer.html' %}
