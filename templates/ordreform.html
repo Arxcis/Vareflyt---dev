@@ -1,0 +1,173 @@
+{% include 'header.html' %}
+
+<form class="form-horizontal" action="/nyordre" method="post">
+  <fieldset>
+
+    <!-- Form Name -->
+    <legend>Fylles ut av butikk</legend>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="varenavn">Varenavn</label>  
+      <div class="col-md-5">
+      <input id="textinput" name="varenavn" type="text" placeholder="Søk" class="form-control input-md" required="">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="vareid">VareID</label>  
+      <div class="col-md-4">
+      <input id="textinput" name="vareID" type="text" placeholder="7 siffer" class="form-control input-md">
+        
+      </div>
+    </div>
+
+    <!-- Select Basic -->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="selectbasic">Antall</label>
+      <div class="col-md-2">
+        <select id="selectbasic" name="vareantall" class="form-control">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+        </select>
+      </div>
+    </div>
+
+    </br>
+    </br>
+
+    <!-- Search input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">Kundenavn</label>  
+      <div class="col-md-5">
+      <input id="textinput" name="kundenavn" type="search" placeholder="Søk" class="form-control input-md" required="">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">KundeID</label>  
+      <div class="col-md-4">
+      <input id="textinput" name="kundeID" type="text" placeholder="7 siffer" class="form-control input-md">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">Telefon</label>  
+      <div class="col-md-4">
+      <input id="textinput" name="kundetelefon" type="text" placeholder="8 siffer" class="form-control input-md" required="">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">E-post</label>  
+      <div class="col-md-4">
+      <input id="textinput" name="kundemail" type="text" class="form-control input-md">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">Adresse</label>  
+      <div class="col-md-5">
+      <input id="textinput" name="kundeadresse" type="text" placeholder="Gateadresse" class="form-control input-md">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput"></label>  
+      <div class="col-md-2">
+      <input id="textinput" name="kundepostboks" type="text" placeholder="Postnummer" class="form-control input-md">
+        
+      </div>
+    </div>
+
+  </fieldset>
+
+  </br>
+
+  <legend>Fylles ut av admin</legend>
+  <fieldset>
+      <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">Leverandør</label>  
+      <div class="col-md-5">
+      <input id="textinput" name="levnavn" type="text" placeholder="Navn" class="form-control input-md" required="">
+        
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">LevID</label>  
+      <div class="col-md-4">
+      <input id="textinput" name="levID" type="text" placeholder="7 siffer" class="form-control input-md">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">Telefon</label>  
+      <div class="col-md-4">
+      <input id="textinput" name="levtelefon" type="text" placeholder="8 siffer" class="form-control input-md">
+        
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">E-post</label>  
+      <div class="col-md-4">
+      <input id="textinput" name="levmail" type="text" placeholder="8 siffer" class="form-control input-md">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput">Adresse</label>  
+      <div class="col-md-5">
+      <input id="textinput" name="levadresse" type="text" placeholder="Gateadresse" class="form-control input-md">
+        
+      </div>
+    </div>
+
+    <!-- Text input-->
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="textinput"></label>  
+      <div class="col-md-2">
+      <input id="textinput" name="levpostboks" type="text" placeholder="Postnummer" class="form-control input-md">
+        
+      </div>
+    </div>
+
+  </fieldset>
+
+  <!--Submit-button -->
+  <div class="form-group">
+      <div class="col-md-4">
+        <input type="submit" name="submit" value="Submit" class="btn btn-success">
+      </div>
+    </div>
+
+</form>
+
+
+{% include 'footer.html' %}

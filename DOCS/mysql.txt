@@ -1,0 +1,41 @@
+Databases host address: 
+        eviate.mysql.pythonanywhere-services.com
+Username: eviate
+
+Databases: eviate$default
+           eviate$eviate_main
+
+
+eviate$eviate_main-tables
+    users:
+     - ID AUTO_INCREMENT=1 000
+     - username
+     - password
+     - mail
+     - rank
+     - settings
+
+    ordreliste:
+     - ID AUTO_INCREMENT=1 000 000
+
+    ordreliste_test
+     - ID AUTO_INCREMENT=1 000 000 PRIMARY KEY
+     - varenavn
+     - vareID
+     - vareantall
+
+     - kundenavn
+     - kundeID
+     - kundetelefon
+     - kundemail
+     - kundeadresse
+     - kundepostboks
+
+     - levnavn
+     - levID
+     - levtelefon
+     - levmail
+     - levadresse
+     - levpostboks
+
+
