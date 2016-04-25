@@ -1,10 +1,10 @@
 {% include 'header.html' %}
 
-<form class="form-horizontal" action="/nyordre" method="post">
+<form class="form-horizontal" action="{{url_for('nyordre')}}" method="post">
   <fieldset>
 
     <!-- Form Name -->
-    <legend>Fylles ut av butikk</legend>
+    <legend><h3>NY ORDRE</h3></legend>
 
     <!-- Text input-->
     <div class="form-group">
@@ -46,6 +46,7 @@
     </br>
     </br>
 
+    <legend><h4>KUNDE</h4></legend>
     <!-- Search input-->
     <div class="form-group">
       <label class="col-md-2 control-label" for="textinput">Kundenavn</label>  
@@ -104,7 +105,7 @@
 
   </br>
 
-  <legend>Fylles ut av admin</legend>
+  <legend><h4>LEVERANDØR<h4></legend>
   <fieldset>
       <!-- Text input-->
     <div class="form-group">
