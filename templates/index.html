@@ -6,6 +6,7 @@
   <div class="table-responsive">          
   <table class="table">
     <thead>
+
       <tr style="background-color: #66ff66; font-weight: bold;">
         {% for head in tabellh %}
             <th> {{ head }} </th>
@@ -17,6 +18,7 @@
           <tr> 
               {% for cell in row %}
                   <td style="font-weight: bold;"> {{ cell }}</td>
+
               {% endfor %}
               <td><a href="{{url_for('edit_ordre')}}?ID={{row[0]}}"> Edit </a></td>
           </tr>

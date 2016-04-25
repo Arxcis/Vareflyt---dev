@@ -24,6 +24,7 @@ def index():
     # MYSQL ------------------------------- QUERY
     # SELECT columns FROM table ORDER BY ID DESC;
     c, conn = connection()
+
     c.execute("SELECT ID, varenavn, vareantall, kundenavn, levnavn, Status FROM "
               "ordreliste_test ORDER BY ID DESC")
 
@@ -113,6 +114,7 @@ def update_ordre():
         WHERE some_column=some_value;"""
 
         c, conn = connection()
+
         c.execute("UPDATE ordreliste_test SET "
                   "varenavn='%s', "
                   "vareID='%s', "
