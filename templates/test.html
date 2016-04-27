@@ -1,13 +1,6 @@
-{% include 'header.html' %}
-<form class='form-vertical'>
+{% for row in table%}
 
-{% for item in ordre %}
- <div class="form-group">
-      <label class="col-md-2 control-label" for="varenavn">Varenavn</label>  
-      <div class="col-md-5">
-      <input id="textinput" name="varenavn" type="text" placeholder="Sok" class="form-control input-md" required="" value='{{ ordre[1] }}'>
-        
-      </div>
-    </div>
+<p>{{ row }}</p>
+
 {% endfor %}
 

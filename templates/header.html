@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Eviate vareflyt</title>
+    <title>STEREO vareflyt</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- BOOTSTRAP -->
     <link type="text/css" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <!-- FONT AWESOME -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-hQpvDQiCJaD2H465dQfA717v7lu5qHWtDbWNPvaTJ0ID5xnPUlVXnKzq7b8YUkbN" crossorigin="anonymous">
+    <!-- jQUERY -->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/style.css')}}">
 
 </head>
@@ -13,29 +20,19 @@
 <div class="container">
 
 <header>
-        <h1>Vareflyt<small> Eviate </small></h1>
+        <h1>VAREFLYT<small> STEREO </small></h1>
 </header>
 
 <div id="nav">
 <nav class="navbar navbar-inverse">
   <div class="container-fluid">
     <ul class="nav navbar-nav">
-    {% if switch.active1 == '1' %}
-      <li class="active">
-    {% else %}
-      <li>
-    {% endif %}
-      <a href="{{url_for('index')}}"> ORDRELISTE </a></li>
-      <li> <a href="#"> VARELISTE </a></li>
-      <li> <a href="#"> KUNDELISTE </a></li> 
-      <li> <a href="#"> LEVERANDØRER </a></li>    
 
-      <li> <a href="{{url_for('ordreform')}}"> NY ORDRE </a></li> 
-      <li> <a href="#"> NY VARE </a> </li>
-      <li> <a href="#"> NY KUNDE </a> </li>
-      <li> <a href="#"> NY LEVERANDØR </a></li> 
-    
-   
+      <li class="active"><a href="{{url_for('bestliste')}}"> OVERSIKT </a></li>
+      <li><a href="{{url_for('bestform')}}"> BESTILLING </a></li>
+      <li><a href="{{url_for('vareliste')}}"> VARER </a></li>
+      <li><a href="{{url_for('uploadform')}}"> UPLOAD </a></li>
+
     </ul>
   </div>
 </nav>

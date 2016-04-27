@@ -1,164 +1,74 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# External library
-from flask import Flask, render_template, request, redirect, url_for, session
+# A very simple Flask Hello World app for you to get started with...
+
+from flask import Flask, session, render_template, url_for, request, redirect, flash
 import gc
-
-# From local file
-from dbconnect import connection
-
+import os
+from dbconnect import SQLTable
 
 app = Flask(__name__)
-
-#@app.route('/')
-#def innlogging():
-#   return render_template('innlogging.html')
 
 
 @app.route('/')
 def index():
-    # I have to simplify this somehow
-    switch = {'active1': '1', 'active2': '0'}
+    return redirect(url_for('bestliste'))
 
-    # MYSQL ------------------------------- QUERY
-    # SELECT columns FROM table ORDER BY ID DESC;
-    c, conn = connection()
+@app.route('/bestliste')
+def bestliste():
+    return render_template('/navpages/bestliste.html')
 
-    c.execute("SELECT ID, varenavn, vareantall, kundenavn, levnavn, Status FROM "
-              "ordreliste_test ORDER BY ID DESC")
+@app.route('/bestform')
+def bestform():
+    return render_template('/navpages/bestform.html')
 
-    header_list = [i[0] for i in c.description]
-    liste_avtuples = c.fetchall()
+@app.route('/vareliste')
+def vareliste():
+    return render_template('/navpages/vareliste.html')
 
-    #Close of and collect garbage
-    c.close()
-    conn.close()
-    gc.collect()
-    # ------------------------------------------
+@app.route('/uploadform')
+def uploadform():
+    return render_template('/navpages/uploadform.html')
 
-    return render_template('index.html', switch=switch, 
-                    tabellh=header_list, tabell=liste_avtuples)
 
-@app.route('/ordreform')
-def ordreform():
-    # I have to simplify this somehow
-    switch = {'active1': '0', 'active2': '1'}
-    return render_template('ordreform.html', switch=switch)
+"""WORK IN PROGRESS
 
-@app.route('/edit-ordreform/', methods=['GET'])
-def edit_ordre():
-    ordre_id = request.args.get('ID')
+This route is supposed to to get a "get-query"
+ from a jQuery-javascript. 
+  Use: SELECT * FROM vareliste
+   Possibly search for specific varegruppe.
 
-    # MYSQL -------------------------------- QUERY
-    # SELECT * FROM table WHERE ID=ordre_id
-    c, conn = connection()
-    c.execute("SELECT * FROM ordreliste_test WHERE ID='%s'" % ordre_id)
-    ordre_info = c.fetchone()
+"""
 
-    #Close of and collect garbage
-    c.close()
-    conn.close()
-    gc.collect()
-    # ------------------------------------------
-    switch = {'active1': '0', 'active2': '1'}
-    return render_template('editordre.html', ordre=ordre_info, 
-                                            switch=switch)
+@app.route('/getvareutvalg')
+def getvareutvalg():
+
+    vareliste = SQLTable('vareliste')
+    json_tuple = vareliste.selecttable()
+
+    return render_template('test.html', table=json_tuple)
+    #return flask.jsonify(tabell=json_table)
 
 
 
-@app.route('/nyordre', methods=['POST'])
-def nyordre():
-    if request.form['submit'] == 'Submit':
+"""WORK IN PROGRESS
 
-        # MYSQL ----------------------------------- QUERY
-        # INSERT INTO table(columns) VALUES (cell-data);
-        c, conn = connection()
-        c.execute("INSERT INTO ordreliste_test(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" 
-                  "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % 
-                      ('varenavn', 'vareID', 'vareantall',
-                       'kundenavn', 'kundeID', 'kundetelefon', 
-                       'kundemail', 'kundeadresse', 'kundepostboks',
-                       'levnavn', 'levID', 'levtelefon', 'levmail', 
-                       'levadresse', 'levpostboks',
-                       request.form['varenavn'],
-                       request.form['vareID'],
-                       request.form['vareantall'],
-                       request.form['kundenavn'],
-                       request.form['kundeID'],
-                       request.form['kundetelefon'],
-                       request.form['kundemail'],
-                       request.form['kundeadresse'],
-                       request.form['kundepostboks'],
-                       request.form['levnavn'],
-                       request.form['levID'],
-                       request.form['levtelefon'],
-                       request.form['levmail'],
-                       request.form['levadresse'],
-                       request.form['levpostboks']))
-        conn.commit()
+    This is a function that is supposed to run, 
+     when a file is uploaded. 
+      1. Take file. 
+      2. Format file. 
+      3. Delete excisting vareliste in MySql-database
+      4. Import new vareliste to MySql.
 
-        #Close of and collect garbage
-        c.close()
-        conn.close()
-        gc.collect()
-        # -------------------------------------------------
+@app.route('/vareupdate')
+def update_vareliste():
+    
+    filnavn = request.args.get('fil')
+    vareliste = SQLTable('vareliste')
 
-    return redirect(url_for('index'))
-
-@app.route('/updateordre', methods=['POST'])
-def update_ordre():
-    if request.form['submit'] == 'Submit':
-        """UPDATE table_name
-        SET column1=value1,column2=value2,...
-        WHERE some_column=some_value;"""
-
-        c, conn = connection()
-
-        c.execute("UPDATE ordreliste_test SET "
-                  "varenavn='%s', "
-                  "vareID='%s', "
-                  "vareantall='%s', "
-                  "kundenavn='%s', "
-                  "kundeID='%s', "
-                  "kundetelefon='%s', "
-                  "kundemail='%s', "
-                  "kundeadresse='%s', "
-                  "kundepostboks='%s', "
-                  "levnavn='%s', "
-                  "levID='%s', "
-                  "levtelefon='%s', "
-                  "levmail='%s', "
-                  "levadresse='%s', "
-                  "levpostboks='%s' WHERE ID=%s" %
-                  (request.form['varenavn'],
-                   request.form['vareID'],
-                   request.form['vareantall'],
-                   request.form['kundenavn'],
-                   request.form['kundeID'],
-                   request.form['kundetelefon'],
-                   request.form['kundemail'],
-                   request.form['kundeadresse'],
-                   request.form['kundepostboks'],
-                   request.form['levnavn'],
-                   request.form['levID'],
-                   request.form['levtelefon'],
-                   request.form['levmail'],
-                   request.form['levadresse'],
-                   request.form['levpostboks'],
-                   request.form['ID']))
-
-        conn.commit()
-
-        #Close of and collect garbage
-        c.close()
-        conn.close()
-        gc.collect()
-        # -------------------------------------------------
-
-    return redirect(url_for('index'))
+    success = vareliste.bulk_update('/home/eviate/mysite/uploads/%s.csv' % filnavn)
+    return success"""
 
 
-#if __name__ == "__main__":
-#    app.debug = True
-#    app.run()
+# set the secret key   

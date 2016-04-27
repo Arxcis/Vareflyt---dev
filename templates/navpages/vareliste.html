@@ -1,0 +1,62 @@
+{% include 'header.html'%}
+
+<table class="table">
+<thead>
+  <tr>
+    <th>Leverandør</th>
+    <th>Artnr</th>
+    <th>Merke</th>
+    <th>Modell</th>
+    <th>Varebeskrivelse</th>
+    <th>Varegruppe</th>
+    <th>Undergruppe</th>
+    <th>MVA</th>
+    <th>Nettopris</th>
+    <th>Utsalgspris</th>
+    <th>DG</th>
+  </tr>
+</thead>
+<tbody>
+
+<script type=text/javascript>
+
+function GetVareUtvalg() {
+        debugger;
+        alert("HEI!");
+        $.ajax({
+            type: "POST",
+            url: "/getvareutvalg",
+            data: '{userId:"' + Id + '"}',
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                debugger;
+                alert(result);
+            },
+            error: function (response) {
+                debugger;
+                alert('error');
+            }
+        });
+
+    }
+
+function writevareutvalg(varer){
+        alert("writevareutvalg started");
+            for (row in varer){
+                document.write('<tr>');
+                for (cell in row){
+                    document.write('<td>' + cell + '</td>');
+                }
+                document.write('</tr>');
+             }
+        } 
+    }
+GetVareUtvalg();
+writevareutvalg(varer);
+</script>
+
+</tbody>
+</table>
+
+  
