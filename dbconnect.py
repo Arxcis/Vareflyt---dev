@@ -30,7 +30,7 @@ class SQLTable():
 
     def selecttable(self):
         c, conn = self.connect()
-        c.execute("SELECT * FROM %s" % self.tabell) 
+        c.execute("SELECT Artnr, Merke, Modell, Utsalgspris FROM %s" % self.tabell) 
         array = c.fetchall()
 
         # Mandatory stuff

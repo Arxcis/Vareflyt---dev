@@ -3,7 +3,8 @@
 
 # A very simple Flask Hello World app for you to get started with...
 
-from flask import Flask, session, render_template, url_for, request, redirect, flash
+from flask import Flask, session, render_template, \
+                url_for, request, redirect, flash, jsonify
 import gc
 import os
 from dbconnect import SQLTable
@@ -47,8 +48,12 @@ def getvareutvalg():
     vareliste = SQLTable('vareliste')
     json_tuple = vareliste.selecttable()
 
-    return render_template('test.html', table=json_tuple)
-    #return flask.jsonify(tabell=json_table)
+    json_string = str(json_tuple)
+    json_string = json_string.replace('(','')
+    json_string = json_string.replace(')','')
+    json_string = json_string.replace('\'','')
+
+    return jsonify(liste=json_string)
 
 
 

@@ -1,62 +1,50 @@
 {% include 'header.html'%}
 
+<script type=text/javascript language="javascript">
+
+    $(document).ready(function() {
+
+        $.getJSON('/getvareutvalg', function(data) {
+
+                var streng = data.liste;
+                var liste = streng.split(",");
+
+
+                $('#tabell').append('<tr>');
+
+                for (i=1; i < liste.length + 1; i++) {
+
+                 if (i % 4 != 0) {
+                    $('#tabell').append('<td>' + liste[i-1] + '</td>');
+
+                  } else { 
+                    $('#tabell').append('<td>' + liste[i-1] + '</td>');
+                    $('#tabell').append('</tr>');
+                    $('#tabell').append('<tr>');
+                  }
+                }
+                
+                 
+               });
+   
+        $('#tabell').append('</tr>');
+}); 
+
+
+</script>
+
 <table class="table">
 <thead>
   <tr>
-    <th>Leverandør</th>
-    <th>Artnr</th>
-    <th>Merke</th>
-    <th>Modell</th>
-    <th>Varebeskrivelse</th>
-    <th>Varegruppe</th>
-    <th>Undergruppe</th>
-    <th>MVA</th>
-    <th>Nettopris</th>
-    <th>Utsalgspris</th>
-    <th>DG</th>
+    <th class="col-md-2">Artnr</th>
+    <th class="col-md-2">Merke</th>
+    <th class="col-md-6">Modell</th>
+    <th class="col-md-2">Utsalgspris</th>   
   </tr>
 </thead>
-<tbody>
-
-<script type=text/javascript>
-
-function GetVareUtvalg() {
-        debugger;
-        alert("HEI!");
-        $.ajax({
-            type: "POST",
-            url: "/getvareutvalg",
-            data: '{userId:"' + Id + '"}',
-            contentType: "application/json;charset=utf-8",
-            dataType: "json",
-            success: function (result) {
-                debugger;
-                alert(result);
-            },
-            error: function (response) {
-                debugger;
-                alert('error');
-            }
-        });
-
-    }
-
-function writevareutvalg(varer){
-        alert("writevareutvalg started");
-            for (row in varer){
-                document.write('<tr>');
-                for (cell in row){
-                    document.write('<td>' + cell + '</td>');
-                }
-                document.write('</tr>');
-             }
-        } 
-    }
-GetVareUtvalg();
-writevareutvalg(varer);
-</script>
-
+<tbody id= "tabell">
+   <!-- javascript runs here -->
 </tbody>
 </table>
-
+<button id='target'>Add varer</button>
   
