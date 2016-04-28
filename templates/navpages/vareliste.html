@@ -21,29 +21,30 @@
     </fieldset>
   </form>
 
-  <table id="bestillingstabell" class="table">
+  <table class="table">
     <thead>
         <tr style="background-color: #70db70;">
-          <th class="col-md-2">VareID</th>
-          <th class="col-md-2">Merke</th>
-          <th class="col-md-4">Modell</th>
-          <th class="col-md-2">Antall</th>
-          <th class="col-md-2">Pris</th>   
+          <th class="col-md-1">VareID</th>
+          <th class="col-md-1">Merke</th>
+          <th class="col-md-3">Modell</th>
+          <th class="col-md-1">Antall</th>
+          <th class="col-md-2 col-md-offset-1">Pris</th>   
         </tr>
       </thead>
-     <tbody id="bestillingsbody">
+     <tbody id="bestillingstabell">
         <!-- JAVASCRIPT goes here-->
      </tbody> 
   </table>
-  <form class="form-horizontal">
-      <!-- Button -->
-      <div class="form-group">
-        <label class="col-md-4 control-label" for="bestillsubmit"></label>
-        <div class="col-md-2 pull-right">
+  <div class="row col-md-4 col-md-offset-9" style="margin-bottom: 10pt;">
+    <div class="col-md-2">
+        <p id="prislapp">0 ,-</p>
+    </div>
+    <form class="form-horizontal">
+        <div class="col-md-2">
           <button id="bestillsubmit" name="bestillsubmit" class="btn btn-success">BESTILL</button>
         </div>
-      </div>
-  </form>
+    </form>
+  </div>
 </section>
 
 
@@ -64,9 +65,9 @@
     <table class="table">
       <thead>
         <tr style="background-color: #70db70;">
-          <th class="col-md-2">Artnr</th>
-          <th class="col-md-2">Merke</th>
-          <th class="col-md-6">Modell</th>
+          <th class="col-md-1">Artnr</th>
+          <th class="col-md-1">Merke</th>
+          <th class="col-md-4">Modell</th>
           <th class="col-md-2">Utsalgspris</th>   
         </tr>
       </thead>
@@ -78,32 +79,89 @@
 
 
 <script type="text/javascript" language="javascript">
-     
-    var varelinjer = [];
+
+    varelinjer = new Array();
+    prislinjer = new Object();
+    total_verdi = 0; 
+
+
+    function sumBestilling(vareID, pris, antall) {
+
+      prislinjer[String(vareID)] = new Array(parseInt(pris), parseInt(antall));
+
+      console.log(prislinjer);
+      total_verdi = 0;
+      for (var key in prislinjer) {
+
+        total_verdi += (prislinjer[key][0] * prislinjer[key][1]); 
+      };
+      console.log(total_verdi + "kroner");
+
+      $("#prislapp").text(String(total_verdi) + ",-");
+
+    }
 
     function AddVare(vareID) {
-     
+      
+
       $.getJSON('/getvarelinje?ID=' + vareID, function(data){
-        
+        var nylinje = [];
         /* FORMAT INCOMMING JSON-STRING*/
-        var varelinje_string = data.row.substring(0, (data.row.length - 1));
+        nylinje = data.row.split(",");
 
-        /* APPEND NEW ARRAY TO VARELINJER */
-        varelinjer[varelinjer.length] =  new Array(varelinje_string);
+        var row_ID = nylinje[0];
+        var stykkpris = nylinje[3];
         
-        var last_row = varelinjer[varelinjer.length - 1];
-        var row_ID = last_row[0];
-  
+        
 
-        $('#bestillingsbody').append('<tr id=\'' + row_ID +'\'>' + '</tr>');
+        if ($.inArray(row_ID, varelinjer) != -1) {
+            return 0;
 
-        for (cell=0; cell < last_row.length; cell++) {
-          $('#' + row_ID).append('<td>' + last_row[cell] + '</td>');
-        }
+        } else {
+          $('#bestillingstabell').append('<tr id="' + row_ID +'">' + '</tr>');
+
+            for (i=0; i < nylinje.length; i++) {
+              switch(i) {
+                case 0:
+                    $('#' + row_ID).append('<td>' + nylinje[i] + '</td>');
+                    break;
+                case 1:
+                    $('#' + row_ID).append('<td>' + nylinje[i] + '</td>');
+                    break;
+                case 2:
+                    $('#' + row_ID).append('<td>' + nylinje[i] + '</td>');
+                    break;
+                case 3:
+                    $('#' + row_ID).append('<td><form class="form-horizontal">' +
+                                             '<select name="selectbasic" class="form-control"' +
+                                             ' onchange="sumBestilling(' + row_ID + ',' + stykkpris + ',this.value)"">' +
+                                              '<option value="1">1</option>' + 
+                                              '<option value="2">2</option>' +
+                                              '<option value="3">3</option>' +
+                                              '<option value="4">4</option>' +
+                                              '<option value="5">5</option>' +
+                                              '<option value="6">6</option>' +
+                                              '<option value="7">7</option>' +
+                                              '<option value="8">8</option>' +
+                                              '<option value="9">9</option>' +
+                                              '<option value="10">10</option>' +
+                                             '</select>' +
+                                           '</form></td>')
+                    break;
+                case 4:
+                    console.log(nylinje[i-1]);
+                    $('#' + row_ID).append('<td>' + String(nylinje[i-1]) + ' ,-</td>');
+                    break;
+              
+                  
+                
+              };
+            };
+          varelinjer.push(row_ID);
+          sumBestilling(row_ID, stykkpris, 1);
+        };
       });
-
     };
-
 </script>
 
 <script type=text/javascript language="javascript">
@@ -157,3 +215,5 @@
       });*/
     }); 
 </script>
+
+{% include 'footer.html' %}

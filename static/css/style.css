@@ -1,7 +1,10 @@
 /* CSS stylesheet */
 
-header {margin: 20pt;}
+html, body {font-family: 'Roboto Condensed', sans-serif;}
 body {background-color: #333333;}
+
+header {margin: 20pt;}
+
 h1 {text-decoration: none;}
 .container {border: 1pt solid black; background-color: #ebd9c6;}
 .form-horizontal {margin-left: 5%;}
