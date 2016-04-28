@@ -1,50 +1,159 @@
 {% include 'header.html'%}
 
-<script type=text/javascript language="javascript">
+<section id="bestillingskort" class="col-md-12">
+  <h3> Bestillingskort </h3>
+  <form class="form-horizontal">
+    <fieldset>
+      <!-- Text input-->
+      <div class="form-group">
+        <label class="col-md-1 control-label" for="textinput">Navn</label>  
+          <div class="col-md-5">
+            <input id="inputnavn" name="textinput" type="text" placeholder="Fornavn og Etternavn" class="form-control input-md" required="">
+    
+          </div>
+          <label class="col-md-1 control-label" for="textinput">Telefon</label>  
+          <div class="col-md-2">
+            <input id="inputtelefon" name="inputtelefon" type="text" placeholder="8 siffer" class="form-control input-md" required="">
+    
+          </div>
+      </div>
+    
+    </fieldset>
+  </form>
 
-    $(document).ready(function() {
+  <table id="bestillingstabell" class="table">
+    <thead>
+        <tr style="background-color: #70db70;">
+          <th class="col-md-2">VareID</th>
+          <th class="col-md-2">Merke</th>
+          <th class="col-md-4">Modell</th>
+          <th class="col-md-2">Antall</th>
+          <th class="col-md-2">Pris</th>   
+        </tr>
+      </thead>
+     <tbody id="bestillingsbody">
+        <!-- JAVASCRIPT goes here-->
+     </tbody> 
+  </table>
+  <form class="form-horizontal">
+      <!-- Button -->
+      <div class="form-group">
+        <label class="col-md-4 control-label" for="bestillsubmit"></label>
+        <div class="col-md-2 pull-right">
+          <button id="bestillsubmit" name="bestillsubmit" class="btn btn-success">BESTILL</button>
+        </div>
+      </div>
+  </form>
+</section>
 
-        $.getJSON('/getvareutvalg', function(data) {
 
-                var streng = data.liste;
-                var liste = streng.split(",");
+<section id="varetabellkort" class="col-md-12">
+  <h3>Varetabell</h3>
+
+  <form class="form-horizontal">
+      <!-- Search input-->
+      <div class="form-group">
+        <label class="col-md-1 control-label" for="searchinput">Søk</label>
+        <div class="col-md-6">
+          <input id="searchvare" name="searchvare" type="search" placeholder="" class="form-control input-md">
+    
+        </div>
+      </div>
+  </form>
+
+    <table class="table">
+      <thead>
+        <tr style="background-color: #70db70;">
+          <th class="col-md-2">Artnr</th>
+          <th class="col-md-2">Merke</th>
+          <th class="col-md-6">Modell</th>
+          <th class="col-md-2">Utsalgspris</th>   
+        </tr>
+      </thead>
+      <tbody id= "varetabell">
+          <!-- javascript- id="tabelllinjer" runs here-->
+      </tbody>
+    </table>
+</section>
 
 
-                $('#tabell').append('<tr>');
+<script type="text/javascript" language="javascript">
+     
+    var varelinjer = [];
 
-                for (i=1; i < liste.length + 1; i++) {
+    function AddVare(vareID) {
+     
+      $.getJSON('/getvarelinje?ID=' + vareID, function(data){
+        
+        /* FORMAT INCOMMING JSON-STRING*/
+        var varelinje_string = data.row.substring(0, (data.row.length - 1));
 
-                 if (i % 4 != 0) {
-                    $('#tabell').append('<td>' + liste[i-1] + '</td>');
+        /* APPEND NEW ARRAY TO VARELINJER */
+        varelinjer[varelinjer.length] =  new Array(varelinje_string);
+        
+        var last_row = varelinjer[varelinjer.length - 1];
+        var row_ID = last_row[0];
+  
 
-                  } else { 
-                    $('#tabell').append('<td>' + liste[i-1] + '</td>');
-                    $('#tabell').append('</tr>');
-                    $('#tabell').append('<tr>');
-                  }
-                }
-                
-                 
-               });
-   
-        $('#tabell').append('</tr>');
-}); 
+        $('#bestillingsbody').append('<tr id=\'' + row_ID +'\'>' + '</tr>');
 
+        for (cell=0; cell < last_row.length; cell++) {
+          $('#' + row_ID).append('<td>' + last_row[cell] + '</td>');
+        }
+      });
+
+    };
 
 </script>
 
-<table class="table">
-<thead>
-  <tr>
-    <th class="col-md-2">Artnr</th>
-    <th class="col-md-2">Merke</th>
-    <th class="col-md-6">Modell</th>
-    <th class="col-md-2">Utsalgspris</th>   
-  </tr>
-</thead>
-<tbody id= "tabell">
-   <!-- javascript runs here -->
-</tbody>
-</table>
-<button id='target'>Add varer</button>
-  
+<script type=text/javascript language="javascript">
+    $(document).ready(function() {
+
+        $.getJSON('/getvareutvalg', function(data) {
+          var inc_string = data.liste;
+          var liste = inc_string.split(",");
+          var bryter = 0;
+          var div_id = '';
+
+          for (i=0; i < liste.length; i++) {
+
+            switch(bryter) {
+              case 0:
+                  div_id = liste[i];
+                  div_id = $.trim(div_id);
+                  $('#varetabell').append('<tr class=\'eventlinje\' id=\'' + div_id + '\' onClick=\'AddVare(this.id)\'>' + '</tr>');
+                  bryter = 1;
+                  break;
+
+              case 1:
+                  $('#' + div_id).append('<td>' + liste[i] + '</td>');
+                  bryter = 2;
+                  break;
+
+              case 2:
+                  $('#' + div_id).append('<td>' + liste[i] + '</td>');
+                  bryter = 3;
+                  break;
+
+              case 3:
+                  $('#' + div_id).append('<td>' + liste[i] + '</td>');
+
+                  bryter = 4;
+                  break;
+
+              case 4:
+                  $('#' + div_id).append('<td>' + liste[i] + ' kr' + '</td>');
+                  bryter = 0;
+                  break;
+
+            };
+          };
+
+      });
+      /*var linjeID = '';
+      $('.eventlinje').onClick( function() {
+          linjeID = $('this').attr('id');
+          AddVare(linjeID);
+      });*/
+    }); 
+</script>

@@ -7,11 +7,12 @@ from flask import Flask, session, render_template, \
                 url_for, request, redirect, flash, jsonify
 import gc
 import os
-from dbconnect import SQLTable
+from SQLlikeapig import MyPig, MyPigTable
 
 app = Flask(__name__)
+db = MyPig()
 
-
+# ---------------- NAV ROUTES -------------------
 @app.route('/')
 def index():
     return redirect(url_for('bestliste'))
@@ -33,27 +34,25 @@ def uploadform():
     return render_template('/navpages/uploadform.html')
 
 
-"""WORK IN PROGRESS
-
-This route is supposed to to get a "get-query"
- from a jQuery-javascript. 
-  Use: SELECT * FROM vareliste
-   Possibly search for specific varegruppe.
-
-"""
-
+# ---------- AJAX ROUTES -------------
 @app.route('/getvareutvalg')
 def getvareutvalg():
 
-    vareliste = SQLTable('vareliste')
-    json_tuple = vareliste.selecttable()
+    vareliste = MyPigTable(db, 'vareliste')
+    table_string = vareliste.selecttable()
+    
+    #return render_template('test.html', table=json_tuple)
+    return jsonify(liste=table_string)
 
-    json_string = str(json_tuple)
-    json_string = json_string.replace('(','')
-    json_string = json_string.replace(')','')
-    json_string = json_string.replace('\'','')
+@app.route('/getvarelinje')
+def getvarelinje():
+    linje_id = request.args.get('ID')
 
-    return jsonify(liste=json_string)
+    vareliste = MyPigTable(db, 'vareliste')
+    row_string = vareliste.selectrow(linje_id)
+
+    return jsonify(row=row_string)
+
 
 
 

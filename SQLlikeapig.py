@@ -6,50 +6,77 @@ import MySQLdb
 import csv
 import gc
 
-class SQLTable():
-    def __init__(self, tabell):
-        
+class MyPig:
+
+    def __init__(self):
         self.host = 'eviate.mysql.pythonanywhere-services.com'
         self.user = 'eviate'
         self.passwd = 'Snemeis16'
-        self.db = 'eviate$eviate_main'
+        self.name = 'eviate$eviate_main'
         self.use_unicode = True
         self.charset = 'utf8'
+
+
+class MyPigTable:
+    def __init__(self, database, tabell):
+        
+        self.db = database
         self.tabell = tabell
-    
-    def connect(self):
-        conn = MySQLdb.connect(host = self.host,
-                               user = self.user,
-                               passwd= self.passwd,
-                               db = self.db,
-                               use_unicode=self.use_unicode, 
-                               charset=self.charset)  
+
+    def open(self):
+        conn = MySQLdb.connect(host = self.db.host,
+                               user = self.db.user,
+                               passwd= self.db.passwd,
+                               db = self.db.name,
+                               use_unicode=self.db.use_unicode, 
+                               charset=self.db.charset)  
         c = conn.cursor()
         return c, conn
 
-
-    def selecttable(self):
-        c, conn = self.connect()
-        c.execute("SELECT Artnr, Merke, Modell, Utsalgspris FROM %s" % self.tabell) 
-        array = c.fetchall()
-
-        # Mandatory stuff
+    def close(self, c, conn):
         conn.commit()
         c.close()
         conn.close()
         gc.collect()
 
-        return array
+    def selecttable(self):
+        # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
+        c, conn = self.open()
+        c.execute("SELECT ID, Artnr, Merke, Modell, Utsalgspris FROM vareliste LIMIT 300") 
+        array = c.fetchall()
+        self.close(c, conn)
+
+        # ------ FORMAT to STRING -------
+        table_s = str(array)
+        table_s = table_s.replace('(','')
+        table_s = table_s.replace(')','')
+        table_s = table_s.replace('\'','')
+
+        return table_s
+
+    def selectrow(self, identity):
+        # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
+        c, conn = self.open()
+        c.execute("SELECT ID, Merke, Modell, Utsalgspris FROM vareliste WHERE ID=%s" % identity)
+        array = c.fetchall()
+        self.close(c, conn)
+
+        # ------ FORMAT to STRING -------
+        row_s = str(array)
+        row_s = row_s.replace('(','')
+        row_s = row_s.replace(')','')
+        row_s = row_s.replace('\'','')
+
+        return row_s
+
+    """WORK IN PROGRESS
 
     def bulk_update(self, file):
-        """WORK IN PROGRESS"""
+        
         c, conn = self.connect()
         c.execute("DELETE FROM %s" % self.tabell)
 
-        conn.commit()
-        c.close()
-        conn.close()
-        gc.collect()
+        self.close(c, conn)
 
         stop = 10
         with open(file, newline='') as csvfile:
@@ -85,7 +112,7 @@ class SQLTable():
                     conn.close()
                     gc.collect()
 
-        return "<h1> Vareliste UPDATED</h1>"
+        return "<h1> Vareliste UPDATED</h1>" """
 
 
 

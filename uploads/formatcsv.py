@@ -7,7 +7,7 @@ def format_csv(file):
         with open(file, newline='') as csvfile:
             vareliste = csv.reader(csvfile, delimiter=';')
             # Build SQL query string
-            sql_string = "INSERT INTO vareliste VALUES("
+            sql_string = "INSERT INTO vareliste VALUES('ID',"
             counter = 0
             for row in vareliste:
 
@@ -32,20 +32,20 @@ def format_csv(file):
 
                 if row[3] != "":
                     if 'æ' or 'Æ' in sql_string:
-                        sql_string = sql_string.replace('æ', 'ae')
-                        sql_string = sql_string.replace('Æ', 'Ae')
+                        sql_string = sql_string.replace('æ', 'æ')
+                        sql_string = sql_string.replace('Æ', 'Æ')
                     if 'ø' or 'Ø' in sql_string:
-                        sql_string = sql_string.replace('ø','oe')
-                        sql_string = sql_string.replace('Ø','Oe')
+                        sql_string = sql_string.replace('ø','ø')
+                        sql_string = sql_string.replace('Ø','Ø')
                     if 'å' or 'Å' in sql_string:
-                        sql_string = sql_string.replace('å', 'aa')
-                        sql_string = sql_string.replace('Å', 'Aa')
+                        sql_string = sql_string.replace('å', 'å')
+                        sql_string = sql_string.replace('Å', 'Å')
 
                 with open('vareliste.txt', 'a') as ffile:
                     ffile.write(sql_string + '; ')
 
-                sql_string = "INSERT INTO vareliste VALUES("
-
+                print(sql_string)
+                sql_string = "INSERT INTO vareliste VALUES('ID',"
                 
 
 

@@ -9,3 +9,5 @@ h1 {text-decoration: none;}
 #ordretable {margin-right: 10%;}
 #nav {border-bottom: 1pt solid black;}
 
+#bestillingskort {border-bottom: 1px solid #ccc; min-height: 200pt;}
+
