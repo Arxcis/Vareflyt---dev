@@ -15,7 +15,7 @@ db = MyPig()
 # ---------------- NAV ROUTES -------------------
 @app.route('/')
 def index():
-    return redirect(url_for('bestliste'))
+    return redirect(url_for('vareliste'))
 
 @app.route('/bestliste')
 def bestliste():
@@ -35,11 +35,44 @@ def uploadform():
 
 
 # ---------- AJAX ROUTES -------------
+
+@app.route('/lagre-bestilling', methods=["POST"])
+def lagre_bestilling():
+    ny_bestilling = {}
+    ny_bestilling['navn'] = request.form['navn']
+    ny_bestilling['telefon'] = request.form['telefon']
+    ny_bestilling['varer'] = request.form['varer']
+    ny_bestilling['verdi'] = request.form['verdi']
+    ny_bestilling['antall'] = request.form['antall']
+
+    vareliste = MyPigTable(db, 'vareliste')
+    success = vareliste.lagre_bestilling(ny_bestilling)    
+
+    return jsonify(result=success)
+
+
+@app.route('/getbestillingsliste')
+def getbestillingsliste():
+    table_string = 'empty'
+    bestillinger = MyPigTable(db, 'bestillinger')
+
+    table_string = bestillinger.selecttable_bestillinger()
+
+    return render_template('test.html', liste=table_string)
+    #return jsonify(liste=table_string)
+
+
 @app.route('/getvareutvalg')
 def getvareutvalg():
 
+    table_string = 'empty'
     vareliste = MyPigTable(db, 'vareliste')
-    table_string = vareliste.selecttable()
+
+    if request.args.get('string'):
+        now_string = request.args.get('string')
+        table_string = vareliste.searchtable(now_string)
+    else:
+        table_string = vareliste.selecttable()
     
     #return render_template('test.html', table=json_tuple)
     return jsonify(liste=table_string)

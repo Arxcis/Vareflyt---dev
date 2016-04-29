@@ -7,7 +7,6 @@ import csv
 import gc
 
 class MyPig:
-
     def __init__(self):
         self.host = 'eviate.mysql.pythonanywhere-services.com'
         self.user = 'eviate'
@@ -39,20 +38,45 @@ class MyPigTable:
         conn.close()
         gc.collect()
 
-    def selecttable(self):
-        # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
-        c, conn = self.open()
-        c.execute("SELECT ID, Artnr, Merke, Modell, Utsalgspris FROM vareliste LIMIT 300") 
-        array = c.fetchall()
-        self.close(c, conn)
 
-        # ------ FORMAT to STRING -------
+    def format_tostring(self, array):
         table_s = str(array)
         table_s = table_s.replace('(','')
         table_s = table_s.replace(')','')
         table_s = table_s.replace('\'','')
 
         return table_s
+
+    def selecttable(self):
+        # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
+        c, conn = self.open()
+        c.execute("SELECT ID, Artnr, Merke, Modell, Utsalgspris FROM vareliste") 
+        array = c.fetchall()
+        self.close(c, conn)
+
+        # ------ FORMAT to STRING -------
+        return self.format_tostring(array)
+
+    def selecttable_bestillinger(self):
+        # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
+        c, conn = self.open()
+        c.execute("SELECT ID, Kundenavn, Verdi, Antall, status FROM bestillinger") 
+        array = c.fetchall()
+        self.close(c, conn)
+
+        # ------ FORMAT to STRING -------
+        #return self.format_tostring(array)
+        return array
+
+    def searchtable(self, string):
+        # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
+        c, conn = self.open()
+        c.execute("SELECT ID, Artnr, Merke, Modell, Utsalgspris FROM vareliste WHERE CONCAT_WS('', ID, Artnr, Merke, Modell) LIKE '%" + string + "%'")
+          
+        array = c.fetchall()
+        self.close(c, conn)
+        # ------ FORMAT to STRING -------
+        return self.format_tostring(array)
 
     def selectrow(self, identity):
         # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
@@ -62,12 +86,22 @@ class MyPigTable:
         self.close(c, conn)
 
         # ------ FORMAT to STRING -------
-        row_s = str(array)
-        row_s = row_s.replace('(','')
-        row_s = row_s.replace(')','')
-        row_s = row_s.replace('\'','')
+        return self.format_tostring(array)
 
-        return row_s
+    def lagre_bestilling(self, ny_bestilling):
+        # nybestilling is a dictionary of [navn, telefon, varer, verdi]
+        # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
+        c, conn = self.open()
+        c.execute("INSERT INTO bestillinger(Kundenavn, Telefon, Varer, Verdi, Antall, opprettet, status) "
+                  "VALUES ('%s', '%s', '%s', '%s', '%s', CURRENT_TIMESTAMP(), 'Ny')" % (ny_bestilling['navn'],
+                  ny_bestilling['telefon'],
+                  ny_bestilling['varer'],
+                  ny_bestilling['verdi'],
+                  ny_bestilling['antall']))
+        self.close(c, conn)
+
+        return 'success'
+
 
     """WORK IN PROGRESS
 

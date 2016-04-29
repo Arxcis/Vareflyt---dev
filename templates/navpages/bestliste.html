@@ -1,1 +1,118 @@
 {% include 'header.html'%}
+
+
+
+<section id="varetabellkort" class="col-md-12">
+  <h3>Varetabell</h3>
+
+  <form class="form-horizontal">
+      <!-- Search input-->
+        <label class="col-md-1 control-label" for="searchinput">Søk</label>
+        <div class="col-md-6">
+          <input id="searchvare" name="searchvare" type="search" placeholder="Tekst" class="form-control input-md" onkeyup="">
+    
+        </div>
+  </form>
+
+    <table class="table">
+      <thead>
+        <tr style="background-color: #70db70;">
+          <th id="bestcolumn1" onClick="currentColumn(this.id)" class="col-md-1">BestID</th>
+          <th id="bestcolumn2" onClick="currentColumn(this.id)" class="col-md-2">Kunde</th>
+          <th id="bestcolumn3" onClick="currentColumn(this.id)" class="col-md-1">Verdi</th>
+          <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-1">Varer</th>
+          <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-2">Opprettet</th> 
+          <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-2">Sist endret</th> 
+          <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-3">STATUS</th>   
+        </tr>
+      </thead>
+      <tbody id= "besttabell">
+          <!-- JAVASCRIPT writes here-->
+
+          <!--   //              -->
+    </table>
+</section>
+
+<script>
+    function populateVareliste(liste) {
+        /* The general function for displaying an array of cells
+            as vareliste */
+           console.log("Populate(input)) -->" + liste[0]);
+           var bryter = 0;
+           var div_id = '';
+           var row_count = 0;
+           var row_color = '';
+          for (i=0; i < liste.length; i++) {
+
+            switch(bryter) {
+              case 0:
+                  div_id = liste[i];
+                  div_id = $.trim(div_id);
+                  $('#besttabell').append('<tr class=\'eventlinje\' id=\'' + div_id + '\' ></tr>');
+
+                  /* ON/OFF SWITCHBOX for the row background color*/ 
+                      if (row_count % 2 === 0){
+                            row_color = '#ffffff';
+                      } else {
+                            row_color = '#f2f2f2';
+                      };
+
+                  $('#' + div_id).css({ 
+                        'background-color' : row_color
+                  });
+                  row_count += 1;
+                  bryter = 1;
+                  break;
+
+              case 1:
+                  $('#' + div_id).append('<td>' + div_id + '</td>');
+                  bryter = 2;
+                  break;
+
+              case 2:
+                  $('#' + div_id).append('<td>' + liste[i] + '</td>');
+                  bryter = 3;
+                  break;
+
+              case 3:
+                  $('#' + div_id).append('<td>' + liste[i] + '</td>');
+                  bryter = 4;
+                  break;
+
+              case 4:
+                  $('#' + div_id).append('<td>' + liste[i] + '</td>');
+                  bryter = 5;
+                  break;
+
+              case 5:
+                  $('#' + div_id).append('<td>' + liste[i] + '</td>');
+                  bryter = 6;
+                  break;
+
+               case 6:
+                  $('#' + div_id).append('<td>' + liste[i] + '</td>');
+                  bryter = 7;
+                  break;
+                case 7:
+                  $('#' + div_id).append('<td>' + liste[i] + '</td>');
+                  bryter = 0;
+                  break;
+
+            };
+          };
+        };
+
+    $(document).ready(function() {
+
+        $.getJSON('/getbestillingsliste', function(data) {
+          var inc_string = data.liste;
+          var liste = inc_string.split(',');
+          populateVareliste(liste);
+      });
+    });
+
+
+</script>
+
+{% include 'footer.html' %}
+
