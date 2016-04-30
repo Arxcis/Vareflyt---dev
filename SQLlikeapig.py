@@ -47,6 +47,11 @@ class MyPigTable:
 
         return table_s
 
+
+    # ------------------------------------------ #
+    """  FUNKSJONER TIL BESTILLING - SKJEMA  """
+    # ----------------------------------------- #
+
     def selecttable(self):
         # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
         c, conn = self.open()
@@ -54,19 +59,7 @@ class MyPigTable:
         array = c.fetchall()
         self.close(c, conn)
 
-        # ------ FORMAT to STRING -------
         return self.format_tostring(array)
-
-    def selecttable_bestillinger(self):
-        # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
-        c, conn = self.open()
-        c.execute("SELECT ID, Kundenavn, Verdi, Antall, opprettet, sist_oppdatert, status FROM bestillinger") 
-        array = c.fetchall()
-        self.close(c, conn)
-
-        # ------ FORMAT to STRING -------
-        #return self.format_tostring(array)
-        return array
 
     def searchtable(self, string):
         # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
@@ -76,7 +69,7 @@ class MyPigTable:
           
         array = c.fetchall()
         self.close(c, conn)
-        # ------ FORMAT to STRING -------
+      
         return self.format_tostring(array)
 
     def selectrow(self, identity):
@@ -89,13 +82,32 @@ class MyPigTable:
         # ------ FORMAT to STRING -------
         return array
 
+
+    # ------------------------------------------ #
+    """  FUNKSJONER TIL BESTILLINGSLISTE  """
+    # ----------------------------------------- #
+
+    def selecttable_bestillinger(self):
+        # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
+        c, conn = self.open()
+        c.execute("SELECT ID, Kundenavn, Verdi, Antall, Ny, sist_oppdatert, status "
+                  "FROM bestillinger ORDER BY statnr") 
+        array = c.fetchall()
+        self.close(c, conn)
+
+        # ------ FORMAT to STRING -------
+        #return self.format_tostring(array)
+        return array
+
+
     def lagre_bestilling(self, ny_bestilling):
         # nybestilling is a dictionary of [navn, telefon, varer, verdi]
         # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
         c, conn = self.open()
         c.execute("INSERT INTO bestillinger"
-                  "(Kundenavn, Telefon, Varer, Verdi, Antall, opprettet, status) "
-                  "VALUES ('%s', '%s', '%s', '%s', '%s', CURRENT_TIMESTAMP(), 'Ny')"
+                  "(Kundenavn, Telefon, Varer, Verdi, Antall, Ny, status) "
+                  "VALUES ('%s', '%s', '%s', '%s', '%s', "
+                  "CURRENT_TIMESTAMP(), 'Ny')"
                    % (ny_bestilling['navn'],
                   ny_bestilling['telefon'],
                   ny_bestilling['varer'],
@@ -105,23 +117,28 @@ class MyPigTable:
 
         return 'success'
 
-    dato_columns = {
-            'Ny': ['opprettet','1']
-            'Bestilt': ['bestilt','2']
-            'Mottatt' : ['mottatt','3']
-            'Levert' : ['levert','4']
-        }
-
     def lagre_status(self, ny_status):
 
+        dato_columns = {
+            'Ny': 1,
+            'Bestilt': 2,
+            'Mottatt' : 3,
+            'Levert' : 4  }
+
         c, conn = self.open()
-        c.execute("UPDATE bestillinger SET status='%s', %s=CURRENT_TIMESTAMP(), statnr=%d WHERE ID='%s'" 
+        c.execute("UPDATE bestillinger SET status='%s', %s=CURRENT_TIMESTAMP(), "
+                  "statnr=%d WHERE ID='%s'" 
                    % (ny_status['status'],
+                      ny_status['status'],
                       dato_columns[ny_status['status']],
                       ny_status['id']))
 
         self.close(c, conn)
         return 'success'
+
+    # ------------------------------------------ #
+    """  FUNKSJONER TIL UPLOAD.html  """
+    # ----------------------------------------- #
 
     """WORK IN PROGRESS
 

@@ -143,10 +143,8 @@
     function deleteVare(obj) {
         /*EVENT onClick() --> element <i></i>*/
         /*Formatting*/ 
-        console.log("deleteVare on ID: " + obj.id);
         var ID = String(obj.id);
         IDvare = ID.replace('delete', '');
-        console.log(IDvare); 
 
         delete bestillingslinjer[IDvare];
         $('#' + IDvare).remove();
