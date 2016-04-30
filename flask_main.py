@@ -12,55 +12,52 @@ from SQLlikeapig import MyPig, MyPigTable
 app = Flask(__name__)
 db = MyPig()
 
+
 # ---------------- NAV ROUTES -------------------
 @app.route('/')
 def index():
-    return redirect(url_for('vareliste'))
+    return redirect(url_for('bestilling_liste'))
 
 @app.route('/bestliste')
-def bestliste():
-    return render_template('/navpages/bestliste.html')
+def bestilling_liste():
+    return render_template('/navpages/bestilling_liste.html')
 
-@app.route('/bestform')
-def bestform():
-    return render_template('/navpages/bestform.html')
-
-@app.route('/vareliste')
-def vareliste():
-    return render_template('/navpages/vareliste.html')
+@app.route('/bestskjema')
+def bestilling_skjema():
+    return render_template('/navpages/bestilling_skjema.html')
 
 @app.route('/uploadform')
 def uploadform():
     return render_template('/navpages/uploadform.html')
 
 
-# ---------- AJAX ROUTES -------------
+# ---------- JAVASCRIPT AJAX ROUTES -------------
 
-@app.route('/lagre-bestilling', methods=["POST"])
+@app.route('/postbestilling', methods=["POST"])
 def lagre_bestilling():
-    ny_bestilling = {}
-    ny_bestilling['navn'] = request.form['navn']
-    ny_bestilling['telefon'] = request.form['telefon']
-    ny_bestilling['varer'] = request.form['varer']
-    ny_bestilling['verdi'] = request.form['verdi']
-    ny_bestilling['antall'] = request.form['antall']
 
-    vareliste = MyPigTable(db, 'vareliste')
-    success = vareliste.lagre_bestilling(ny_bestilling)    
+    best = MyPigTable(db, 'vareliste')
+    success = best.lagre_bestilling(request.form)    
 
     return jsonify(result=success)
 
+@app.route('/poststatus', methods=["POST"])
+def lagre_status():
 
-@app.route('/getbestillingsliste')
-def getbestillingsliste():
+    best = MyPigTable(db, 'bestillinger')
+    success = best.lagre_status(request.form)
+
+    return jsonify(result=success)
+
+@app.route('/getbestliste')
+def getbestilling_liste():
     table_string = 'empty'
-    bestillinger = MyPigTable(db, 'bestillinger')
+    best = MyPigTable(db, 'bestillinger')
 
-    table_string = bestillinger.selecttable_bestillinger()
+    best_array = best.selecttable_bestillinger()
 
-    return render_template('test.html', liste=table_string)
+    return jsonify(tabell=best_array)
     #return jsonify(liste=table_string)
-
 
 @app.route('/getvareutvalg')
 def getvareutvalg():
@@ -82,11 +79,13 @@ def getvarelinje():
     linje_id = request.args.get('ID')
 
     vareliste = MyPigTable(db, 'vareliste')
-    row_string = vareliste.selectrow(linje_id)
+    linje_array = vareliste.selectrow(linje_id)
 
-    return jsonify(row=row_string)
+    return jsonify(linje=linje_array)
 
-
+@app.route('/getsortcolumn')
+def getsortcolumn():
+    return 0
 
 
 """WORK IN PROGRESS

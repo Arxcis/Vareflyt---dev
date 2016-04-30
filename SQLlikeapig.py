@@ -60,7 +60,7 @@ class MyPigTable:
     def selecttable_bestillinger(self):
         # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
         c, conn = self.open()
-        c.execute("SELECT ID, Kundenavn, Verdi, Antall, status FROM bestillinger") 
+        c.execute("SELECT ID, Kundenavn, Verdi, Antall, opprettet, sist_oppdatert, status FROM bestillinger") 
         array = c.fetchall()
         self.close(c, conn)
 
@@ -71,7 +71,8 @@ class MyPigTable:
     def searchtable(self, string):
         # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
         c, conn = self.open()
-        c.execute("SELECT ID, Artnr, Merke, Modell, Utsalgspris FROM vareliste WHERE CONCAT_WS('', ID, Artnr, Merke, Modell) LIKE '%" + string + "%'")
+        c.execute("SELECT ID, Artnr, Merke, Modell, Utsalgspris FROM vareliste WHERE"
+                  " CONCAT_WS('', ID, Artnr, Merke, Modell) LIKE '%" + string + "%'")
           
         array = c.fetchall()
         self.close(c, conn)
@@ -86,14 +87,16 @@ class MyPigTable:
         self.close(c, conn)
 
         # ------ FORMAT to STRING -------
-        return self.format_tostring(array)
+        return array
 
     def lagre_bestilling(self, ny_bestilling):
         # nybestilling is a dictionary of [navn, telefon, varer, verdi]
         # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
         c, conn = self.open()
-        c.execute("INSERT INTO bestillinger(Kundenavn, Telefon, Varer, Verdi, Antall, opprettet, status) "
-                  "VALUES ('%s', '%s', '%s', '%s', '%s', CURRENT_TIMESTAMP(), 'Ny')" % (ny_bestilling['navn'],
+        c.execute("INSERT INTO bestillinger"
+                  "(Kundenavn, Telefon, Varer, Verdi, Antall, opprettet, status) "
+                  "VALUES ('%s', '%s', '%s', '%s', '%s', CURRENT_TIMESTAMP(), 'Ny')"
+                   % (ny_bestilling['navn'],
                   ny_bestilling['telefon'],
                   ny_bestilling['varer'],
                   ny_bestilling['verdi'],
@@ -102,6 +105,23 @@ class MyPigTable:
 
         return 'success'
 
+    dato_columns = {
+            'Ny': ['opprettet','1']
+            'Bestilt': ['bestilt','2']
+            'Mottatt' : ['mottatt','3']
+            'Levert' : ['levert','4']
+        }
+
+    def lagre_status(self, ny_status):
+
+        c, conn = self.open()
+        c.execute("UPDATE bestillinger SET status='%s', %s=CURRENT_TIMESTAMP(), statnr=%d WHERE ID='%s'" 
+                   % (ny_status['status'],
+                      dato_columns[ny_status['status']],
+                      ny_status['id']))
+
+        self.close(c, conn)
+        return 'success'
 
     """WORK IN PROGRESS
 

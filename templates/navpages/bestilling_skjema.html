@@ -34,7 +34,7 @@
       </thead>
      <tbody id="bestillingstabell">
         <!-- JAVASCRIPT writes here-->
-
+        <!-- Se-> function AddVare(vareID) {}-->
         <!--   //              -->
      </tbody> 
   </table>
@@ -57,7 +57,7 @@
       <div class="form-group">
         <label class="col-md-1 control-label" for="searchinput">Søk</label>
         <div class="col-md-6">
-          <input id="searchvare" name="searchvare" type="search" placeholder="Tekst" class="form-control input-md" onkeyup="searchForString(this.value)">
+          <input id="searchfield" name="searchvare" type="search" placeholder="Tekst" class="form-control input-md" onkeyup="searchForString(this.value)">
     
         </div>
       </div>
@@ -107,25 +107,17 @@
             antall += parseInt(bestillingslinjer[key][1]);
             vare_counter += 1;
         };
-        /*DEBUGGING*/
-        console.log(navn_bestiller);
-        console.log(telefon_bestiller);
-        console.log(vare_array);
-        console.log(verdi_bestilling);
-        console.log(antall);
 
-
-        $.post("/lagre-bestilling", {
-                'navn': navn_bestiller,
+        $.post("/postbestilling", {
+                'navn': String(navn_bestiller),
                 'telefon': String(telefon_bestiller),
                 'varer': String(vare_array),
                 'verdi': String(verdi_bestilling),
                 'antall': String(antall)
 
             }, function(data){
-
-                alert("you recieved " + data.result);
-                window.location.assign('/');
+                console.log("you recieved " + data.result);
+                window.location.assign('/bestliste');
         });
 
     };
@@ -163,7 +155,6 @@
 
     /* FUNCTION ADDS A VARELINJE TO BESTILLINGSKORT*/ 
     function AddVare(vareID) {
-      console.log("AddVare(input)->" + vareID);
 
       /* LINJECOLOR SWITCHBOX*/
       var row_color = ''
@@ -174,16 +165,15 @@
           };
           best_row_count += 1;
       
+      /* SQL - ACTION: 
+        c.execute("SELECT ID, Merke, Modell, Utsalgspris FROM vareliste WHERE ID=%s" % identity)*/
       $.getJSON('/getvarelinje?ID=' + vareID, function(data){
         var nylinje = [];
-        /* FORMAT INCOMMING JSON-STRING*/
-        nylinje = data.row.split(",");
-
+        nylinje = data.linje[0];
         var row_ID = "selected" + nylinje[0];
         var stykkpris = nylinje[3];
 
-        console.log("ROW ID: " + row_ID);
-
+      /* SKRIVE linje til HTML dokument*/
         if (bestillingslinjer.hasOwnProperty(row_ID)) {
             return 0;
 

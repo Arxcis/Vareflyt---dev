@@ -1,0 +1,171 @@
+{% include 'header.html'%}
+
+
+
+<section id="besttabellkort" class="col-md-12">
+  <h3>Bestillinger</h3>
+
+  <form class="form-horizontal">
+      <!-- Search input-->
+        <label class="col-md-1 control-label" for="searchinput">Søk</label>
+        <div id="searchbar" class="col-md-6">
+          <input id="searchfield" name="searchvare" type="search" placeholder="Tekst" class="form-control input-md" onkeyup="">
+    
+        </div>
+  </form>
+
+    <table class="table">
+      <thead>
+        <tr style="background-color: #70db70;">
+          <th id="bestcolumn1" onClick="currentColumn(this.id)" class="col-md-1">BestID</th>
+          <th id="bestcolumn2" onClick="currentColumn(this.id)" class="col-md-3">Kunde</th>
+          <th id="bestcolumn3" onClick="currentColumn(this.id)" class="col-md-1">Verdi</th>
+          <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-1">Varer</th>
+          <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-2">Opprettet</th> 
+          <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-2">Sist endret</th> 
+          <th id="bestcolumn4" style="text-align:center;" onClick="currentColumn(this.id)" class="col-md-2">STATUS</th>   
+        </tr>
+      </thead>
+      <tbody id= "besttabell">
+          <!-- JAVASCRIPT writes here-->
+            <!--function populateBesttabell(tabell) {} -->
+          <!--   //              -->
+    </table>
+</section>
+
+<script>
+    buttonArray = {'Ny': ['btn btn-danger', 'btn btn-warning', 'Bestilt'],
+              'Bestilt': ['btn btn-warning','btn btn-info', 'Mottatt'],
+              'Mottatt': ['btn btn-info', 'btn btn-success', 'Levert'],
+              'Levert' : 'btn btn-success' 
+            }
+
+    function populateBesttabell(tabell) {
+        /* The general function for displaying an array of cells
+            as vareliste */
+     var bryter = 0;
+     var div_id = '';
+     var row_count = 0;
+     var row_color = '';
+     var row = '';
+     var cell = '';
+
+    for (i=0; i < tabell.length; i++) {
+      row = tabell[i];
+
+      for (j=0; j < row.length; j++){
+        cell = row[j];
+
+        switch(bryter) {
+          case 0:
+              div_id = cell;
+              div_id = $.trim(div_id);
+              $('#besttabell').append('<tr class=\'eventlinje\' id=\'' + div_id + '\' ></tr>');
+
+              /* ON/OFF SWITCHBOX for the row background color*/ 
+              if (row_count % 2 === 0){
+                       row_color = '#ffffff';
+              } else { row_color = '#f2f2f2';
+              };
+              $('#' + div_id).css({ 
+                'background-color' : row_color
+              });
+              row_count += 1;
+              bryter = 1;
+              break;
+          case 1:
+              $('#' + div_id).append('<td>' + div_id + '</td>');/*cell['ID']*/
+              bryter = 2;
+              $('#' + div_id).append('<td>' + cell + '</td>');  /*cell['Navn']*/
+              break;
+          case 2:
+              $('#' + div_id).append('<td>' + cell + ',-</td>'); /*cell['Verdi']*/
+              bryter = 3;
+              break;
+          case 3:
+              $('#' + div_id).append('<td>' + cell + '</td>'); /*cell['Varer']*/
+              bryter = 4;
+              break;
+          case 4:
+              $('#' + div_id).append('<td>' + cell + '</td>'); /*cell['opprettet']*/
+              bryter = 5;
+              break;
+           case 5:
+              $('#' + div_id).append('<td>' + cell + '</td>'); /*cell['sist oppdatert']*/
+              bryter = 6;
+              break;
+            case 6:
+              current = buttonArray[cell][0];
+              $('#' + div_id).append('<td class="row" style="text-align:center;">'+
+                                     '<button id="'+ div_id+'button" '+
+                                     'style="margin:auto;" type="button" ' +
+                                     'onClick="cloneButton(this.id)" ' +
+                                     'class="'+ current +'">'+ cell + '' +
+                                     '</button></td>'); /*cell['STATUS']*/
+              bryter = 7;
+              break;
+        };
+      };
+      bryter = 0;
+    };
+  };
+      function cloneButton(buttonID) {
+          var old_button = $('#'+buttonID);
+          if (old_button.text() != 'Levert') {
+          var cell_parent = $('#'+buttonID).parent();
+          var new_button = $('#'+buttonID).clone();
+          new_button.empty();
+          old_button.attr("onClick", "changeStatus(this.id)");
+
+          new_button.attr("id", buttonID + 'newStatus');
+          new_button.attr("onClick", "changeStatus(this.id)");
+          new_button.attr("class", buttonArray[old_button.text()][1]);
+          new_button.append(buttonArray[old_button.text()][2]);
+          cell_parent.append(new_button);
+          } else {
+            return 0;
+          }
+        
+      };
+      function changeStatus(buttonID){
+        var status_button = $('#' + buttonID);
+        status_button.siblings().remove();
+        status_button.attr("onClick", "cloneButton(this.id)")
+
+         var switchID = status_button.attr('id');
+         if (switchID.indexOf('newStatus') > -1){
+          var status = status_button.text();
+          var id = buttonID.split("b")[0];
+
+          console.log("Ny status er" + status);
+          console.log("RadID er: " + id); 
+
+          $.post("/poststatus", {
+                'status': String(status),
+                'id': String(id)
+
+            }, function(data){
+                console.log("you recieved " + data.result);
+          });
+         } else {
+          return 0;
+         };
+
+        };
+
+    $(document).ready(function() {
+
+        /* INPUT from:
+           getbestilling_liste():
+               return jsonify(tabell=best_array)*/ 
+        $.getJSON('/getbestliste', function(data) {
+          populateBesttabell(data.tabell);
+      });
+      
+    });
+
+
+</script>
+
+{% include 'footer.html' %}
+
