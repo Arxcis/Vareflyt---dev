@@ -1,5 +1,7 @@
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <!--GoogleFontsAPI -->
     <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
     <!-- BOOTSTRAP -->
@@ -16,11 +18,11 @@
     </header>
 
     <div id="loginbox"> 
-        <form action="/login" method="post" class="form-signin col-xs-10 col-sm-4  col-lg-2">
+        <form action="{{ url_for('login') }}" method="post" class="form-signin col-xs-10 col-sm-4  col-lg-2">
             <label for="inputEmail" class="sr-only">Brukernavn</label>
-                <input type="name" id="inputUsernam" class="form-control" placeholder="Brukernavn" required autofocus>
+                <input type="name" id="inputUsernam" class="form-control" placeholder="Brukernavn" name="brukernavn" required autofocus>
             <label for="inputPassword" class="sr-only">Passord</label>
-                <input type="password" id="inputPassword" class="form-control" placeholder="Passord" required>
+                <input type="password" id="inputPassword" class="form-control" placeholder="Passord" name=passord required>
 
             <button class="btn btn-lg btn-primary btn-block" type="submit">OK</button>
         </form>

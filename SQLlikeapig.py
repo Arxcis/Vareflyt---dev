@@ -6,17 +6,17 @@ import MySQLdb
 import csv
 import gc
 
-class MyPig:
+class MyPigFarm:
     def __init__(self):
-        self.host = 'eviate.mysql.pythonanywhere-services.com'
-        self.user = 'eviate'
-        self.passwd = 'Snemeis16'
-        self.name = 'eviate$eviate_main'
+        self.host = 'localhost'
+        self.user = 'root'
+        self.passwd = 'Snemeis15'
+        self.name = 'stereo'
         self.use_unicode = True
         self.charset = 'utf8'
 
 
-class MyPigTable:
+class MyPig:
     def __init__(self, database, tabell):
         
         self.db = database
@@ -55,22 +55,24 @@ class MyPigTable:
     def selecttable(self):
         # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
         c, conn = self.open()
-        c.execute("SELECT ID, Artnr, Merke, Modell, Utsalgspris FROM vareliste") 
+        c.execute("SELECT ID, Varegruppe, Merke, Modell, Utsalgspris "
+                  "FROM vareliste") 
         array = c.fetchall()
         self.close(c, conn)
 
-        return self.format_tostring(array)
+        return array
 
     def searchtable(self, string):
         # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
         c, conn = self.open()
-        c.execute("SELECT ID, Artnr, Merke, Modell, Utsalgspris FROM vareliste WHERE"
-                  " CONCAT_WS('', ID, Artnr, Merke, Modell) LIKE '%" + string + "%'")
-          
+        c.execute("SELECT ID, Varegruppe, Merke, Modell, Utsalgspris "
+                  "FROM vareliste WHERE CONCAT_WS"
+                  "('', ID, Varegruppe, Merke, Modell, Utsalgspris) "
+                  "LIKE '%" + string + "%'")
         array = c.fetchall()
         self.close(c, conn)
       
-        return self.format_tostring(array)
+        return array
 
     def selectrow(self, identity):
         # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
@@ -81,24 +83,6 @@ class MyPigTable:
 
         # ------ FORMAT to STRING -------
         return array
-
-
-    # ------------------------------------------ #
-    """  FUNKSJONER TIL BESTILLINGSLISTE  """
-    # ----------------------------------------- #
-
-    def selecttable_bestillinger(self):
-        # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
-        c, conn = self.open()
-        c.execute("SELECT ID, Kundenavn, Verdi, Antall, Ny, sist_oppdatert, status "
-                  "FROM bestillinger ORDER BY statnr") 
-        array = c.fetchall()
-        self.close(c, conn)
-
-        # ------ FORMAT to STRING -------
-        #return self.format_tostring(array)
-        return array
-
 
     def lagre_bestilling(self, ny_bestilling):
         # nybestilling is a dictionary of [navn, telefon, varer, verdi]
@@ -116,6 +100,22 @@ class MyPigTable:
         self.close(c, conn)
 
         return 'success'
+
+    # ------------------------------------------ #
+    """  FUNKSJONER TIL BESTILLINGSLISTE  """
+    # ----------------------------------------- #
+
+    def selecttable_bestillinger(self):
+        # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
+        c, conn = self.open()
+        c.execute("SELECT ID, Kundenavn, Verdi, Antall, Ny, sist_oppdatert, status "
+                  "FROM bestillinger ORDER BY statnr, ID DESC") 
+        array = c.fetchall()
+        self.close(c, conn)
+
+        # ------ FORMAT to STRING -------
+        #return self.format_tostring(array)
+        return array
 
     def lagre_status(self, ny_status):
 
@@ -137,8 +137,17 @@ class MyPigTable:
         return 'success'
 
     # ------------------------------------------ #
-    """  FUNKSJONER TIL UPLOAD.html  """
+    """  FUNKSJONER TIL INNLOGGING  """
     # ----------------------------------------- #
+
+    def select_ifusername(self, username):
+
+        c, conn = self.open()
+        c.execute("SELECT * FROM brukere WHERE brukernavn='%s'" % username)
+        data = c.fetchone()[2]
+        self.close(c, conn)
+        return data
+
 
     """WORK IN PROGRESS
 

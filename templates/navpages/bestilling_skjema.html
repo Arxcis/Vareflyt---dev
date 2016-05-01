@@ -1,81 +1,77 @@
 {% include 'header.html'%}
 
 <section id="bestillingskort" class="col-md-12">
-  <h3> Bestillingskort </h3>
-  <form class="form-horizontal">
-    <fieldset>
+
+    <h3> Bestillingskort </h3>
+    <form class="form-horizontal">
       <!-- Text input-->
-      <div class="form-group">
-        <label class="col-md-1 control-label" for="textinput">Navn</label>  
-          <div class="col-md-5">
-            <input id="inputnavn" name="textinput" type="text" placeholder="Fornavn og Etternavn" class="form-control input-md" value="">
-    
-          </div>
-          <label class="col-md-1 control-label" for="textinput">Telefon</label>  
-          <div class="col-md-2">
-            <input id="inputtelefon" name="inputtelefon" type="text" placeholder="8 siffer" class="form-control input-md" value="">
-    
-          </div>
-      </div>
-    
-    </fieldset>
-  </form>
-
-  <table class="table">
-    <thead>
-        <tr style="background-color: #70db70;">
-          <th class="col-md-1">VareID</th>
-          <th class="col-md-1">Merke</th>
-          <th class="col-md-4">Modell</th>
-          <th class="col-md-1">Antall</th>
-          <th class="col-md-1">Pris</th>
-          <th class="col-md-1">Fjern</th>    
-        </tr>
-      </thead>
-     <tbody id="bestillingstabell">
-        <!-- JAVASCRIPT writes here-->
-        <!-- Se-> function AddVare(vareID) {}-->
-        <!--   //              -->
-     </tbody> 
-  </table>
-  <div class="row col-md-4 col-md-offset-9" style="margin-bottom: 10pt;">
-    <div class="col-md-2">
-        <p id="prislapp">0 ,-</p>
-    </div>
-        <div class="col-md-2">
-          <button id="bestillsubmit" name="bestillsubmit" class="btn btn-success" onClick="sendBestilling()">BESTILL</button>
+        <div class="form-group">
+            <label class="col-md-1 control-label" for="textinput">Navn</label>  
+            <div class="col-md-5">
+                <input id="inputnavn" name="textinput" type="text" placeholder="Fornavn og Etternavn" class="form-control input-md" value="">
+            </div>
+            <label class="col-md-1 control-label" for="textinput">Telefon</label>  
+            <div class="col-md-2">
+                <input id="inputtelefon" name="inputtelefon" type="text" placeholder="8 siffer" class="form-control input-md" value="">
+            </div>
         </div>
-  </div>
-</section>
-
-
-<section id="varetabellkort" class="col-md-12">
-  <h3>Varetabell</h3>
-
-  <form class="form-horizontal">
-      <!-- Search input-->
-      <div class="form-group">
-        <label class="col-md-1 control-label" for="searchinput">Søk</label>
-        <div class="col-md-6">
-          <input id="searchfield" name="searchvare" type="search" placeholder="Tekst" class="form-control input-md" onkeyup="searchForString(this.value)">
-    
-        </div>
-      </div>
-  </form>
+    </form>
 
     <table class="table">
-      <thead>
-        <tr style="background-color: #70db70;">
-          <th id="varecolumn1" onClick="currentColumn(this.id)" class="col-md-1">VareID</th>
-          <th id="varecolumn2" onClick="currentColumn(this.id)" class="col-md-1">Merke</th>
-          <th id="varecolumn3" onClick="currentColumn(this.id)" class="col-md-4">Modell</th>
-          <th id="varecolumn4" onClick="currentColumn(this.id)" class="col-md-2">Utsalgspris</th>   
-        </tr>
-      </thead>
-      <tbody id= "varetabell">
-          <!-- JAVASCRIPT writes here-->
+        <thead>
+            <tr style="background-color: #70db70;">
+                <th class="col-md-1">VareID</th>
+                <th class="col-md-1">Merke</th>
+                <th class="col-md-4">Modell</th>
+                <th class="col-md-1">Antall</th>
+                <th class="col-md-1">Pris</th>
+                <th class="col-md-1">Fjern</th>    
+            </tr>
+        </thead>
 
-          <!--   //              -->
+        <tbody id="bestillingstabell">
+            <!-- function AddVare(vareID) {}-->
+        </tbody> 
+
+    </table>
+        <!-- I have to do seomthing about the element below -->
+        <!-- Maybe use flexbox -->
+    <div class="row col-md-4 col-md-offset-9" style="margin-bottom: 10pt;">
+        <div class="col-md-2" style=" background-color: #f2f2f2; padding-top: 1rem; padding-right: 2rem;">
+            <p id="prislapp">0kr</p>
+        </div>
+        <div class="col-md-2">
+            <button id="bestillsubmit" name="bestillsubmit" class="btn btn-success" onClick="sendBestilling()">BESTILL</button>
+        </div>
+    </div>
+</section>
+
+<section id="varetabellkort" class="col-md-12">
+    <h3>Varetabell</h3>
+
+    <form class="form-horizontal">
+        <!-- Search input-->
+        <label class="col-md-1 control-label" for="searchinput">Søk</label>
+        <fieldset id=sokeform class="col-md-5">
+            <input id="searchfield" name="searchvare" type="search" placeholder="Tekst" class="form-control input-md" onkeyup="searchForString(this.value)">
+        </fieldset>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr style="background-color: #70db70; margin-top: 20pt;">
+                <th id="varecolumn1" onClick="currentColumn(this.id)" class="col-md-1">VareID</th>
+                <th id="varecolumn1" onClick="currentColumn(this.id)" class="col-md-1">Gruppe</th>
+                <th id="varecolumn2" onClick="currentColumn(this.id)" class="col-md-1">Merke</th>
+                <th id="varecolumn3" onClick="currentColumn(this.id)" class="col-md-4">Modell</th>
+                <th id="varecolumn4" onClick="currentColumn(this.id)" class="col-md-2">Utsalgspris</th>   
+            </tr>
+        </thead>
+
+        <tbody id= "varetabell">
+          <!--  function populateVareliste(liste) { } -->
+        </tbody>
+
     </table>
 </section>
 
@@ -123,13 +119,12 @@
     };
 
     function sumBestilling() {
-      total_verdi = 0;
-      for (var key in bestillingslinjer) {
-        total_verdi += (bestillingslinjer[key][0] * bestillingslinjer[key][1]); 
-      };
+        total_verdi = 0;
 
-      console.log("Oppdatert sum er" + total_verdi + "kroner");
-      $("#prislapp").text(String(total_verdi) + ",-");
+        for (var key in bestillingslinjer) {
+            total_verdi += (bestillingslinjer[key][0] * bestillingslinjer[key][1]); 
+        };
+        $("#prislapp").text(String(total_verdi) + ",-");
 
     }
 
@@ -151,177 +146,161 @@
         sumBestilling();
     };
 
-    /* FUNCTION ADDS A VARELINJE TO BESTILLINGSKORT*/ 
+
+    var nylinje = [];
+    var row_color = '';
+    var row_ID = '';
+    var stykkpris = '';
+
     function AddVare(vareID) {
+        /* FUNCTION ADDS A VARELINJE TO BESTILLINGSKORT*/ 
+        /* LINJECOLOR SWITCHBOX*/
 
-      /* LINJECOLOR SWITCHBOX*/
-      var row_color = ''
-          if (best_row_count % 2 === 0){
-                row_color = '#f2f2f2';
-          } else {
-                row_color = '#ffffff';
-          };
-          best_row_count += 1;
-      
-      /* SQL - ACTION: 
-        c.execute("SELECT ID, Merke, Modell, Utsalgspris FROM vareliste WHERE ID=%s" % identity)*/
-      $.getJSON('/getvarelinje?ID=' + vareID, function(data){
-        var nylinje = [];
-        nylinje = data.linje[0];
-        var row_ID = "selected" + nylinje[0];
-        var stykkpris = nylinje[3];
-
-      /* SKRIVE linje til HTML dokument*/
-        if (bestillingslinjer.hasOwnProperty(row_ID)) {
-            return 0;
-
+        if (best_row_count % 2 === 0){
+            row_color = '#f2f2f2';
         } else {
-          /* Linjeelement with css styling*/
-          $('#bestillingstabell').append('<tr id="' + row_ID +'">' + '</tr>');
-          $('#' + row_ID).css({
-            'background-color': row_color
-          });
+            row_color = '#ffffff';
+        };
+        best_row_count += 1;
+      
+        /* SQL - ACTION: 
+        c.execute("SELECT ID, Merke, Modell, Utsalgspris FROM vareliste WHERE ID=%s" % identity)*/
+        $.getJSON('/getvarelinje?ID=' + vareID, function(data){
+            nylinje = data.linje[0];
+            row_ID = "selected" + nylinje[0];
+            stykkpris = nylinje[3];
 
-          /* Cell elements */ 
-            $('#' + row_ID).append('<td>' + nylinje[0] + '</td>');
+            /* SKRIVE linje til HTML dokument*/
+            if (bestillingslinjer.hasOwnProperty(row_ID)) {
+                return 0;
 
-            $('#' + row_ID).append('<td>' + nylinje[1] + '</td>');
+            } else {
+                $('#'+ vareID).css({ 'background-color': '#80bfff' });
+                /* Linjeelement with css styling*/
+                $('#bestillingstabell').append('<tr id="' + row_ID +'">' + '</tr>');
+                $('#' + row_ID).css({ 'background-color': row_color });
 
-            $('#' + row_ID).append('<td>' + nylinje[2] + '</td>');
+                /* Cell elements */ 
+                $('#' + row_ID).append('<td>' + nylinje[0] + '</td>');
 
-            $('#' + row_ID).append('<td><form class="form-horizontal">' +
-                                     '<select name="' + row_ID +'" class="form-control" '+
-                                      'onchange="updateAntall(this.value, this.name)">' +
-                                      '<option value="1">1</option>' + 
-                                      '<option value="2">2</option>' +
-                                      '<option value="3">3</option>' +
-                                      '<option value="4">4</option>' +
-                                      '<option value="5">5</option>' +
-                                      '<option value="6">6</option>' +
-                                      '<option value="7">7</option>' +
-                                      '<option value="8">8</option>' +
-                                      '<option value="9">9</option>' +
-                                      '<option value="10">10</option>' +
-                                     '</select>' +
-                                   '</form></td>')
+                $('#' + row_ID).append('<td>' + nylinje[1] + '</td>');
 
-            $('#' + row_ID).append('<td>' + String(nylinje[3]) + ' ,-</td>');
-         
-            $('#' + row_ID).append( '<td><div id="'+ row_ID +'delete" '+
-                                    '" onClick="deleteVare(this)">'  +
-                                    '<i class="fa fa-times" aria-hidden="true">'+
-                                    '</i></div></td>');             
-    
-              };
+                $('#' + row_ID).append('<td>' + nylinje[2] + '</td>');
+
+                $('#' + row_ID).append('<td><form class="form-horizontal">' +
+                                         '<select name="' + row_ID +'" class="form-control" '+
+                                          'onchange="updateAntall(this.value, this.name)">' +
+                                          '<option value="1">1</option>' + 
+                                          '<option value="2">2</option>' +
+                                          '<option value="3">3</option>' +
+                                          '<option value="4">4</option>' +
+                                          '<option value="5">5</option>' +
+                                          '<option value="6">6</option>' +
+                                          '<option value="7">7</option>' +
+                                          '<option value="8">8</option>' +
+                                          '<option value="9">9</option>' +
+                                          '<option value="10">10</option>' +
+                                         '</select>' +
+                                       '</form></td>')
+
+                $('#' + row_ID).append('<td>' + String(nylinje[3]) + 'kr</td>');
+             
+                $('#' + row_ID).append( '<td><div id="'+ row_ID +'delete" '+
+                                        '" onClick="deleteVare(this)">'  +
+                                        '<i class="fa fa-times" aria-hidden="true">'+
+                                        '</i></div></td>');             
+        
+            };
             bestillingslinjer[row_ID] = new Array(parseInt(nylinje[3]), parseInt(1));
             sumBestilling();
-            });
-        };
+        });
+    };
 
 </script>
 
 <script navn="søk_vareliste" type="text/javascript">
 
-    selected_column = 'Modell';
+    var selected_column = 'Modell';
 
     function currentColumn(columnID) {
-        console.log("ID of column:" + columnID);
-        console.log("Text of column: " + $('#'+ columnID).text());
         selected_column = $('#'+ columnID).text();
-
         /* This does not work*/
     }
 
     function searchForString(string){
+        $.getJSON('/getvareutvalg?string=' + string , function(data) {
 
-        console.log("Søkefelt has entered: " + string);
-
-        var result_string = '';
-        var result_list = [];
-
-        if (string != '') {
-            $.getJSON('/getvareutvalg?' + 
-                      'string=' + string , function(data) {
-
-                    result_string = data.liste;
-                    result_list = result_string.split(',');
-
-                    $("#varetabell").empty();
-                    populateVareliste(result_list);
-            });
-        } else {
-
-            return 0;
-        };
-
+            $("#varetabell").empty();
+            populateVareliste(data.tabell);
+        });
     };
 </script>
 
 <script name="vareliste_populate" type="text/javascript">
 
-    function populateVareliste(liste) {
-        /* The general function for displaying an array of cells
-            as vareliste */
-           console.log("Populate(input)) -->" + liste[0]);
-           var bryter = 0;
-           var div_id = '';
-           var row_count = 0;
-           var row_color = '';
-          for (i=0; i < liste.length; i++) {
-
-            switch(bryter) {
-              case 0:
-                  div_id = liste[i];
-                  div_id = $.trim(div_id);
-                  $('#varetabell').append('<tr class=\'eventlinje\' id=\'' + div_id + '\' onClick=\'AddVare(this.id)\'>' + '</tr>');
-
-                  /* ON/OFF SWITCHBOX for the row background color*/ 
-                      if (row_count % 2 === 0){
-                            row_color = '#ffffff';
-                      } else {
-                            row_color = '#f2f2f2';
-                      };
-
-                  $('#' + div_id).css({ 
-                        'background-color' : row_color
-                  });
-                  row_count += 1;
-                  bryter = 1;
-                  break;
-
-              case 1:
-                  $('#' + div_id).append('<td>' + div_id + '</td>');
-                  bryter = 2;
-                  break;
-
-              case 2:
-                  $('#' + div_id).append('<td>' + liste[i] + '</td>');
-                  bryter = 3;
-                  break;
-
-              case 3:
-                  $('#' + div_id).append('<td>' + liste[i] + '</td>');
-                  bryter = 4;
-                  break;
-
-              case 4:
-                  $('#' + div_id).append('<td>' + liste[i] + ' kr' + '</td>');
-                  bryter = 0;
-                  break;
-
-            };
-          };
-
-    };
-
     $(document).ready(function() {
 
         $.getJSON('/getvareutvalg', function(data) {
-          var inc_string = data.liste;
-          var liste = inc_string.split(',');
-          populateVareliste(liste);
-      });
+
+            populateVareliste(data.tabell);
+        });
     }); 
+
+    var row = '';
+    var cell = '';
+    var bryter = 0;
+    var div_id = '';
+    var row_count = 0;
+    var row_color = '';
+
+    function populateVareliste(tabell) {
+        /* The general function for displaying an array of cells
+            as vareliste */
+        for (i=0; i < tabell.length; i++) {
+            row = tabell[i];
+
+            for (j=0; j < row.length; j++){
+                cell = row[j];
+
+                switch(bryter) {
+                    case 0:
+                        div_id = cell;
+                        $('#varetabell').append('<tr class=\'eventlinje\' id=\'' + div_id + '\' onClick=\'AddVare(this.id)\'>' + '</tr>');
+
+                          /* ON/OFF SWITCHBOX for the row background color*/ 
+                              if (row_count % 2 === 0){
+                                    row_color = '#ffffff';
+                              } else {
+                                    row_color = '#e6e6e6';
+                              };
+
+                        $('#' + div_id).css({ 
+                                'background-color' : row_color
+                        });
+                        row_count += 1;
+                        bryter = 1;
+                        break;
+                    case 1:
+                        $('#' + div_id).append('<td>' + div_id + '</td>');
+                        bryter = 2;
+                        $('#' + div_id).append('<td>' + cell + '</td>');
+                        break; 
+                    case 2:
+                        $('#' + div_id).append('<td>' + cell + '</td>');
+                        bryter = 3;
+                        break;
+                    case 3:
+                        $('#' + div_id).append('<td>' + cell + '</td>');
+                        bryter = 4;
+                        break;
+                    case 4:
+                        $('#' + div_id).append('<td>' + cell + ' kr' + '</td>');
+                        bryter = 0;
+                        break;
+                };
+            };
+        };
+    };
 </script>
 
 {% include 'footer.html' %}

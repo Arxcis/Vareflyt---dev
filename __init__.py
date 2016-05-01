@@ -5,39 +5,81 @@
 
 from flask import Flask, session, render_template, \
                 url_for, request, redirect, flash, jsonify
+from functools import wraps
 import gc
 import os
-from SQLlikeapig import MyPig, MyPigTable
+from SQLlikeaPig import MyPigFarm, MyPig
 
 app = Flask(__name__)
-db = MyPig()
 
+# ---- INIT SQL-pigs ---------
+db = MyPigFarm()
+vareliste = MyPig(db, 'vareliste')
+best = MyPig(db, 'bestillinger')
+brukere = MyPig(db, 'brukere')
+
+
+# This wrapper safeguards locked down sites
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'innlogget' in session:
+            return f(*args, **kwargs)
+        else:
+            return redirect(url_for('index'))
+    return wrap
 
 # ---------------- NAV ROUTES -------------------
 
 @app.route('/')
 def index():
-
-    return render_template('login.html')
+    if 'innlogget' in session:
+        return redirect(url_for('bestilling_liste'))
+    else:
+        return render_template('login.html')
 
 @app.route('/login', methods=["POST"])
 def login():
+
+    brukernavn = request.form['brukernavn']
+    passord = request.form['passord']
     try:
-        something()
+        data = brukere.select_ifusername(brukernavn)
+        if data == passord:
+            session['innlogget'] = True
+            session['brukernavn'] = brukernavn
+
+            return redirect(url_for('bestilling_liste'))
+        else:
+            return render_template('login.html', error = 'Feil brukernavn eller passord')
+
     except Exception as e:
-        return render_template('login.html', error = e) 
+        return render_template('login.html', error = e)
+
+@app.route('/logout')
+@login_required
+def logout():
+    try:
+        session.clear()
+        gc.collect()
+        return render_template('login.html', error= "Du ble logget ut")
+    except Exception as e:
+        return render_template('login.html', error = e)
 
 @app.route('/bestliste')
+@login_required
 def bestilling_liste():
 
     return render_template('/navpages/bestilling_liste.html')
 
 @app.route('/bestskjema')
+@login_required
 def bestilling_skjema():
 
     return render_template('/navpages/bestilling_skjema.html')
 
 @app.route('/uploadform')
+@login_required
 def uploadform():
 
     return render_template('/navpages/uploadform.html')
@@ -51,29 +93,26 @@ def uploadform():
 @app.route('/postbestilling', methods=["POST"])
 def lagre_bestilling():
 
-    best = MyPigTable(db, 'vareliste')
     success = best.lagre_bestilling(request.form)    
 
     return jsonify(result=success)
 
 @app.route('/getvareutvalg')
 def getvareutvalg():
-
+    now_string = request.args.get('string')
     table_string = 'empty'
-    vareliste = MyPigTable(db, 'vareliste')
-    if request.args.get('string'):
-        now_string = request.args.get('string')
-        table_string = vareliste.searchtable(now_string)
-    else:
-        table_string = vareliste.selecttable()
     
-    return jsonify(liste=table_string)
+    if request.args.get('string'):
+        table_array = vareliste.searchtable(now_string)
+    else:
+        table_array = vareliste.selecttable()
+    
+    return jsonify(tabell=table_array)
 
 @app.route('/getvarelinje')
 def getvarelinje():
 
     linje_id = request.args.get('ID')
-    vareliste = MyPigTable(db, 'vareliste')
     linje_array = vareliste.selectrow(linje_id)
 
     return jsonify(linje=linje_array)
@@ -90,8 +129,6 @@ def getsortcolumn():
 @app.route('/getbestliste')
 def getbestilling_liste():
 
-    table_string = 'empty'
-    best = MyPigTable(db, 'bestillinger')
     best_array = best.selecttable_bestillinger()
 
     return jsonify(tabell=best_array)
@@ -99,15 +136,16 @@ def getbestilling_liste():
 @app.route('/poststatus', methods=["POST"])
 def lagre_status():
     try:
-        best = MyPigTable(db, 'bestillinger')
         success = best.lagre_status(request.form)
-
         return jsonify(result=success)
 
     except Exception as e:
         return jsonify(result= "Server ERROR: " + str(e))
 
 
+
+if __name__ == "__main__":
+	app.run()
 
 """WORK IN PROGRESS
 

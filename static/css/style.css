@@ -7,11 +7,10 @@ header {margin: 20pt;}
 
 h1 {text-decoration: none;}
 .container {border: 1pt solid black; background-color: #ebd9c6;}
-.form-horizontal {margin-left: 5%;}
+.form-horizontal {margin-left: 5%; margin-bottom: 30pt;}
 #main {margin-top: 30pt; margin-left: 5%; margin-bottom: 30pt;}
 #ordretable {margin-right: 10%;}
 #nav {border-bottom: 1pt solid black;}
 
-#bestillingskort {border-bottom: 1pt     solid #ccc; min-height: 200pt;}
-#searchbar {margin-bottom: 20pt;}
-
+#bestillingskort {border-bottom: 1pt solid #ccc; min-height: 200pt;}
+#sokeform {padding-bottom: 20pt;}

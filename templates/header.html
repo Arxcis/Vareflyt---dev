@@ -27,17 +27,21 @@
 
 <div id="nav">
 <nav class="navbar navbar-inverse">
-  <div class="container-fluid">
-    <ul class="nav navbar-nav">
-
-
-    <!-- possible to implement class=active -->
-      <li><a href="{{url_for('bestilling_liste')}}"> OVERSIKT </a></li>
-      <li><a href="{{url_for('bestilling_skjema')}}"> VARER </a></li>
-      <li><a href="{{url_for('uploadform')}}"> UPLOAD </a></li>
-
-    </ul>
-  </div>
+    <div class="container-fluid">
+        <ul class="nav navbar-nav">
+            <!-- possible to implement class=active -->
+            <li><a href="{{url_for('bestilling_liste')}}"> OVERSIKT </a></li>
+            <li><a href="{{url_for('bestilling_skjema')}}"> VARER </a></li>
+            {% if session['brukernavn'] == 'admin' %}
+            <li><a href="{{url_for('uploadform')}}"> UPLOAD </a></li>
+            {% endif %}
+            <li><a href="#"> {{ session['brukernavn']}}</a></li>
+            <li><a href="{{url_for('logout')}}">LOGOUT</a></li>
+            
+              
+        </ul>
+            
+    </div>
 </nav>
 </div>
       

@@ -97,7 +97,7 @@
                         $('#' + div_id).append('<td class="row" style="text-align:center;">'+
                                                  '<button id="'+ div_id+'button" '+
                                                  'style="margin:auto;" type="button" ' +
-                                                 'onClick="cloneButton(this.id)" ' +
+                                                 '{% if session["brukernavn"] == "admin" %}onClick="cloneButton(this.id){% endif %}" ' +
                                                  'class="'+ current +'">'+ cell + '' +
                                                  '</button></td>'); /*cell['STATUS']*/
                         bryter = 0;
