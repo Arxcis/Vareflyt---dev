@@ -10,18 +10,15 @@ header {margin: 20pt;}
 h1 {text-decoration: none;}
 .container {border: 1pt solid black; background-color: #ebd9c6;}
 .form-horizontal {margin-left: 5%; margin-bottom: 30pt;}
-#main {margin-top: 30pt; margin-left: 5%; margin-bottom: 30pt;}
+#main {margin-top: 30pt; margin-left: 5%; margin-bottom: 70pt;}
 #ordretable {margin-right: 10%;}
 #nav {border-bottom: 1pt solid black;}
 
 #bestillingskort {border-bottom: 1pt solid #ccc; min-height: 200pt; background-color: #fff; padding: 15px; border-radius: 15px;  box-shadow:5px 5px 5px 0px rgba(22,22,22,0.4);}
-#varetabellkort {background-color: #fff; padding: 15px; border-radius: 15px;  box-shadow:5px 5px 5px 0px rgba(22,22,22,0.4); margin-top: 50px}
+#varetabellkort {background-color: #fff; padding: 15px; border-radius: 15px;  box-shadow:5px 5px 5px 0px rgba(22,22,22,0.4); margin-top: 50px; margin-bottom: 50px;}
 
 .margintop {margin-top: 50px;}
 #sokeform {padding-bottom: 20pt;}
 
-.hiddenRow {
-    padding: 0 !important;
-}
-
 .eventlinje:hover {cursor: pointer;}
+

@@ -55,7 +55,7 @@ class MyPig:
     def selecttable(self):
         # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
         c, conn = self.open()
-        c.execute("SELECT ID, Varegruppe, Merke, Modell, Utsalgspris "
+        c.execute("SELECT Varenr, Varegruppe, Merke, Modell, Utsalgspris "
                   "FROM vareliste") 
         array = c.fetchall()
         self.close(c, conn)
@@ -65,9 +65,9 @@ class MyPig:
     def searchtable(self, string):
         # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
         c, conn = self.open()
-        c.execute("SELECT ID, Varegruppe, Merke, Modell, Utsalgspris "
+        c.execute("SELECT Varenr, Varegruppe, Merke, Modell, Utsalgspris "
                   "FROM vareliste WHERE CONCAT_WS"
-                  "('', ID, Varegruppe, Merke, Modell, Utsalgspris) "
+                  "('', Varenr, Varegruppe, Merke, Modell, Utsalgspris) "
                   "LIKE '%" + string + "%'")
         array = c.fetchall()
         self.close(c, conn)
@@ -77,7 +77,7 @@ class MyPig:
     def selectrow(self, identity):
         # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
         c, conn = self.open()
-        c.execute("SELECT ID, Merke, Modell, Utsalgspris FROM vareliste WHERE ID=%s" % identity)
+        c.execute("SELECT Varenr, Merke, Modell, Utsalgspris FROM vareliste WHERE Varenr='%s'" % identity)
         array = c.fetchall()
         self.close(c, conn)
 
@@ -147,7 +147,7 @@ class MyPig:
     def get_varetabell(self, id_array):
         c, conn = self.open()
         id_string = ",".join([str(i) for i in id_array])
-        c.execute("SELECT ID, Varegruppe, Merke, Modell, Utsalgspris FROM vareliste WHERE ID in (%s)" % id_string)
+        c.execute("SELECT Varenr, Varegruppe, Merke, Modell, Utsalgspris FROM vareliste WHERE Varenr in (%s)" % id_string)
 
         varetabell = c.fetchall()
         self.close(c, conn)
@@ -157,7 +157,7 @@ class MyPig:
     def delete_bestilling(self, ident):
 
         c, conn = self.open()
-        c.execute("DELETE FROM bestillinger WHERE ID=%s LIMIT 1" % ident)
+        c.execute("DELETE FROM bestillinger WHERE ID=%s" % ident)
         self.close(c, conn)
 
         return "success"
@@ -179,7 +179,7 @@ if __name__ == "__main__":
     db = MyPigFarm()
     vareliste = MyPig(db, 'vareliste')
 
-    print(vareliste.delete_bestilling('30'))
+    print(vareliste.delete_bestilling('36'))
 
 
 

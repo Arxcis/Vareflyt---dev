@@ -29,7 +29,10 @@ def login_required(f):
             return redirect(url_for('index'))
     return wrap
 
-# ---------------- NAV ROUTES -------------------
+
+# -------------------------------------------#
+"""             LOGIN ROUTES              """
+# -------------------------------------------#
 
 @app.route('/')
 def index():
@@ -57,17 +60,9 @@ def login():
     except Exception as e:
         return render_template('login.html', error = e)
 
-
-@app.route('/logout')
-@login_required
-def logout():
-    try:
-        session.clear()
-        gc.collect()
-        return render_template('login.html', error= "Du ble logget ut")
-    except Exception as e:
-        return render_template('login.html', error = e)
-
+# -------------------------------------------#
+"""               NAV ROUTES             """
+# -------------------------------------------#
 
 @app.route('/bestliste')
 @login_required
@@ -88,6 +83,47 @@ def bestilling_skjema():
 def uploadform():
 
     return render_template('/navpages/uploadform.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    try:
+        session.clear()
+        gc.collect()  
+        return render_template('login.html', error= "Du ble logget ut")
+    except Exception as e:
+        return render_template('login.html', error = e)
+
+# -------------------------------------------#
+"""               VIEW ROUTES            """
+# -------------------------------------------#
+
+@app.route('/viewenkelbest')
+@login_required
+def view_enkelbest():
+    try:
+        best_id = request.args.get('ID')
+
+        array = vareliste.get_varearray(best_id)
+
+        array = array[0]
+        array = array.split(",")
+        vareid_array = []
+        antall_array = []
+        for i in range(0, len(array)):
+            if i % 2 != 0:
+                antall_array.append(array[i])
+            else:
+                vareid_array.append(array[i])
+
+        varetabell = best.get_varetabell(vareid_array)
+        try:  
+            return render_template('views/enkelbestilling.html', bestid=best_id, tabell=varetabell, antall=antall_array)
+        except Exception as e:
+            return render_template('login.html', error = "HERE " + str(e))
+
+    except Exception as e:
+        return render_template('login.html', error = e)
 
 
 # ---------- JAVASCRIPT AJAX ROUTES -------------
@@ -141,7 +177,7 @@ def getbestilling_liste():
     return jsonify(tabell=best_array)
 
 
-@app.route('/poststatus', methods=["POST"])
+@app.route('/poststatus', methods=['POST'])
 def lagre_status():
     try:
         success = best.lagre_status(request.form)
@@ -151,39 +187,13 @@ def lagre_status():
         return jsonify(result= "Server ERROR: " + str(e))
 
 
-@app.route('/viewenkelbest')
-def view_enkelbest():
-    try:
-        best_id = request.args.get('ID')
-
-        array = vareliste.get_varearray(best_id)
-
-        array = array[0]
-        array = array.split(",")
-        vareid_array = []
-        antall_array = []
-        for i in range(0, len(array)):
-            if i % 2 != 0:
-                antall_array.append(array[i])
-            else:
-                vareid_array.append(array[i])
-
-        varetabell = best.get_varetabell(vareid_array)
-        try:  
-            return render_template('views/enkelbestilling.html', bestid=best_id, tabell=varetabell, antall=antall_array)
-        except Exception as e:
-            return render_template('login.html', error = "HERE " + str(e))
-
-    except Exception as e:
-        return render_template('login.html', error = e)
-
-
-@app.route('/postdeletebest', methods=['POST'])
+@app.route('/postdeletebest')
 def delete_best():
     try:
-        best_id = request.form('ID')
+        best_id = request.args.get('ID')
         success = best.delete_bestilling(best_id)
-        render_template('')
+        return jsonify(result = str(success))
+
     except Exception as e:
         return render_template('login.html', error = e)
 

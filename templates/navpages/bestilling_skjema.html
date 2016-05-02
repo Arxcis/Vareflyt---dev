@@ -37,7 +37,7 @@
         <!-- I have to do seomthing about the element below -->
         <!-- Maybe use flexbox -->
     <div class="row col-md-4 col-md-offset-9" style="margin-bottom: 10pt;">
-        <div class="col-md-2" style=" background-color: #f2f2f2; padding-top: 1rem; padding-right: 2rem;">
+        <div class="col-md-2" style=" background-color: #f2f2f2; padding-top: 3pt; padding-right: 10pt">
             <p id="prislapp">0kr</p>
         </div>
         <div class="col-md-2">
@@ -60,11 +60,11 @@
     <table class="table table-bordered table-striped">
         <thead>
             <tr style="background-color: #70db70; margin-top: 20pt;">
-                <th id="varecolumn1" onClick="currentColumn(this.id)" class="col-md-1">VareID</th>
-                <th id="varecolumn1" onClick="currentColumn(this.id)" class="col-md-1">Gruppe</th>
-                <th id="varecolumn2" onClick="currentColumn(this.id)" class="col-md-1">Merke</th>
-                <th id="varecolumn3" onClick="currentColumn(this.id)" class="col-md-4">Modell</th>
-                <th id="varecolumn4" onClick="currentColumn(this.id)" class="col-md-2">Utsalgspris</th>   
+                <th id="varecolumn1" class="col-md-1">VareID</th>
+                <th id="varecolumn1" class="col-md-1">Gruppe</th>
+                <th id="varecolumn2" class="col-md-1">Merke</th>
+                <th id="varecolumn3" class="col-md-4">Modell</th>
+                <th id="varecolumn4" class="col-md-2">Utsalgspris</th>   
             </tr>
         </thead>
 
@@ -74,6 +74,24 @@
 
     </table>
 </section>
+
+
+<!--                                    EVENTS                                                  -->
+<!-- 1. BESTILL-knapp: 
+                    <button id="bestillsubmit" onClick="sendBestilling()></button>              -->
+
+<!-- 2. FJERN VARE-knapp: 
+                    <div id="'+ row_ID +'delete" onClick="deleteVare(this)"></div>              -->
+
+<!-- 3. Legg vare-knapp:
+                    <tr class="eventlinje" id="' + div_id + '" onClick="AddVare(this.id)"></tr> -->
+
+<!-- 4. SØK VARE-felt: 
+                    <input id="searchfield" onkeyup="searchForString(this.value)">              -->
+
+<!-- 5. On Document Load 
+                    function(data) { populateVareliste(data.tabell) };                           -->
+
 
 
 <script navn="bestillingsscript" type="text/javascript" language="javascript">
@@ -106,8 +124,7 @@
 
             antall_bestilling += parseInt(bestillingslinjer[key][1]);
             vare_counter += 1;
-        };
-        
+        };       
         
         if (navn_bestiller === "" || telefon_bestiller === "" || varer_bestilling.length < 1) {
             $("#bestwarning").remove();
@@ -226,7 +243,7 @@
                                          '</select>' +
                                        '</form></td>')
 
-                $('#' + row_ID).append('<td>' + String(nylinje[3]) + 'kr</td>');
+                $('#' + row_ID).append('<td>' + nylinje[3] + 'kr</td>');
              
                 $('#' + row_ID).append( '<td><div id="'+ row_ID +'delete" '+
                                         '" onClick="deleteVare(this)">'  +
@@ -243,13 +260,6 @@
 
 <script navn="søk_vareliste" type="text/javascript">
 
-    var selected_column = 'Modell';
-
-    function currentColumn(columnID) {
-        selected_column = $('#'+ columnID).text();
-        /* This does not work*/
-    }
-
     function searchForString(string){
         $.getJSON('/getvareutvalg?string=' + string , function(data) {
 
@@ -264,7 +274,6 @@
     $(document).ready(function() {
 
         $.getJSON('/getvareutvalg', function(data) {
-
             populateVareliste(data.tabell);
         });
     }); 
@@ -288,7 +297,7 @@
                 switch(bryter) {
                     case 0:
                         div_id = cell;
-                        $('#varetabell').append('<tr class=\'eventlinje\' id=\'' + div_id + '\' onClick=\'AddVare(this.id)\'>' + '</tr>');
+                        $('#varetabell').append('<tr class="eventlinje" id="' + div_id + '" onClick="AddVare(this.id)">' + '</tr>');
 
                           /* ON/OFF SWITCHBOX for the row background color*/ 
                               if (row_count % 2 === 0){

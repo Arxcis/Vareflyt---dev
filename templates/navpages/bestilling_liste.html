@@ -13,8 +13,7 @@
                 <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-1">Varer</th>
                 <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-2">Opprettet</th> 
                 <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-2">Sist endret</th> 
-                <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-2" style="text-align:center;">STATUS</th>   
-                <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-1">Fjern</th>
+                <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-2" style="text-align:center;">STATUS</th>
             </tr>
         </thead>
         <tbody id= "besttabell">
@@ -32,6 +31,24 @@
           populateBesttabell(data.tabell);
         });  
     });
+
+    var datetime = '';
+    var dateint = 0; 
+    var timejustert = '';
+    var resultstring = '';
+
+    function formatTime(datetime){
+        datetime = datetime.split(":").join(" ");
+        datetime = datetime.split(" ");
+        dateint = parseInt(datetime[4]) + 6;
+        if (dateint > 23) {
+            timejustert = "0" + String(dateint - 24);
+        } else {
+            timejustert = String(dateint);
+        };
+        result = datetime[1] + ' ' +  datetime[2] + ' ' + datetime[3] + ' - ' + timejustert + ':' + datetime[5];
+        return result;
+    };  
 
     var bryter = 0;
     var div_id = '';
@@ -81,14 +98,12 @@
                         bryter = 4;
                         break;
                     case 4:
-                        dato_cell = cell.split(", ")[1]
-                        dato_cell = dato_cell.substring(0, dato_cell.length - 7)
+                        dato_cell = formatTime(cell);
                         $('#' + div_id).append('<td>' + dato_cell + '</td>'); /*cell['opprettet']*/
                         bryter = 5;
                         break;
                     case 5:
-                        dato_cell = cell.split(", ")[1]
-                        dato_cell = dato_cell.substring(0, dato_cell.length - 7)
+                        dato_cell = formatTime(cell);
                         $('#' + div_id).append('<td>' + dato_cell + '</td>'); /*cell['sist oppdatert']*/
                         bryter = 6;
                         break;
@@ -99,23 +114,13 @@
                                                  'style="margin:auto;" type="button" ' +
                                                  '{% if session["brukernavn"] == "admin" %}onClick="cloneButton(this.id){% endif %}" ' +
                                                  'class="'+ current +'">'+ cell + '' +
-                                                 '</button></td>'); /*cell['STATUS']*/
-
-                        $('#' + div_id).append('<td><div id="'+ div_id +'delete" '+
-                                        'onClick="deleteBestilling(this)"><i class="fa fa-times" aria-hidden="true"></td>');
+                                                 '</button></td>'); /*cell['STATUS']*/ 
                         bryter = 0;
                         break;
                     };
                 };
             };
         };
-
-
-    var selected_bestID = '';
-    function deleteBestilling(obj) {
-        selected_bestID = obj.attr("id").split("del")[0];
-        
-    };
 
     var new_button = '';
     var old_button = '';

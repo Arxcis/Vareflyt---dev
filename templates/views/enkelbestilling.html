@@ -29,6 +29,26 @@
     </tbody>
 </table>
 
-<button class="btn btn-success"><a href="{{ url_for('bestilling_liste') }} ">TILBAKE</a></button>
+<div class="row">
+    <button class="btn btn-success"><a href="{{ url_for('bestilling_liste') }} ">TILBAKE</a></button>
+    <button class="btn btn-danger" onClick="deleteBestilling({{ bestid }})">SLETT</button>
+
+<script type="text/javascript">
+
+    var selected_bestID = '';
+
+    function deleteBestilling(id) {
+        console.log(id);
+        selected_bestID = String(id).split("del")[0];
+        console.log(selected_bestID);
+        $.getJSON('/postdeletebest?ID='+selected_bestID, function(data){
+            console.log("You recieved " + data.result)
+            if (data.result === 'success') {
+                window.location.replace('/bestliste');
+            };
+        });
+    };
+
+</script>
 
 {% include 'footer.html'%}
