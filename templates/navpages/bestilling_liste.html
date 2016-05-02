@@ -8,12 +8,13 @@
         <thead>
             <tr style="background-color: #70db70;">
                 <th id="bestcolumn1" onClick="currentColumn(this.id)" class="col-md-1">BestID</th>
-                <th id="bestcolumn2" onClick="currentColumn(this.id)" class="col-md-3">Kunde</th>
+                <th id="bestcolumn2" onClick="currentColumn(this.id)" class="col-md-2">Kunde</th>
                 <th id="bestcolumn3" onClick="currentColumn(this.id)" class="col-md-1">Verdi</th>
                 <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-1">Varer</th>
                 <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-2">Opprettet</th> 
                 <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-2">Sist endret</th> 
                 <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-2" style="text-align:center;">STATUS</th>   
+                <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-1">Fjern</th>
             </tr>
         </thead>
         <tbody id= "besttabell">
@@ -100,13 +101,21 @@
                                                  'class="'+ current +'">'+ cell + '' +
                                                  '</button></td>'); /*cell['STATUS']*/
 
-
+                        $('#' + div_id).append('<td><div id="'+ div_id +'delete" '+
+                                        'onClick="deleteBestilling(this)"><i class="fa fa-times" aria-hidden="true"></td>');
                         bryter = 0;
                         break;
                     };
                 };
             };
         };
+
+
+    var selected_bestID = '';
+    function deleteBestilling(obj) {
+        selected_bestID = obj.attr("id").split("del")[0];
+        
+    };
 
     var new_button = '';
     var old_button = '';

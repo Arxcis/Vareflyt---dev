@@ -153,6 +153,15 @@ class MyPig:
         self.close(c, conn)
 
         return varetabell
+
+    def delete_bestilling(self, ident):
+
+        c, conn = self.open()
+        c.execute("DELETE FROM bestillinger WHERE ID=%s LIMIT 1" % ident)
+        self.close(c, conn)
+
+        return "success"
+
     # ------------------------------------------ #
     """  FUNKSJONER TIL INNLOGGING  """
     # ----------------------------------------- #
@@ -170,25 +179,9 @@ if __name__ == "__main__":
     db = MyPigFarm()
     vareliste = MyPig(db, 'vareliste')
 
-    array = vareliste.get_varearray('6')
+    print(vareliste.delete_bestilling('30'))
 
-    array = array[0]
-    array = array.split(",")
-    print("after ", array)
-    vareid_array = []
-    antall_array = []
-    for i in range(0, len(array)):
-        if i % 2 != 0:
-            antall_array.append(array[i])
-        else:
-            vareid_array.append(array[i])
 
-    print("vareid_array ", vareid_array)
-    try:
-        varetabell = vareliste.get_varetabell(vareid_array)
-    except Exception as e: 
-        print("You had an error with get_varetabell " + str(e))
-    print(varetabell)
 
 
     """WORK IN PROGRESS

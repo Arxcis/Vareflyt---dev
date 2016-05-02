@@ -38,6 +38,7 @@ def index():
     else:
         return render_template('login.html')
 
+
 @app.route('/login', methods=["POST"])
 def login():
 
@@ -56,6 +57,7 @@ def login():
     except Exception as e:
         return render_template('login.html', error = e)
 
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -66,17 +68,20 @@ def logout():
     except Exception as e:
         return render_template('login.html', error = e)
 
+
 @app.route('/bestliste')
 @login_required
 def bestilling_liste():
 
     return render_template('/navpages/bestilling_liste.html')
 
+
 @app.route('/bestskjema')
 @login_required
 def bestilling_skjema():
 
     return render_template('/navpages/bestilling_skjema.html')
+
 
 @app.route('/uploadform')
 @login_required
@@ -97,6 +102,7 @@ def lagre_bestilling():
 
     return jsonify(result=success)
 
+
 @app.route('/getvareutvalg')
 def getvareutvalg():
     now_string = request.args.get('string')
@@ -109,6 +115,7 @@ def getvareutvalg():
     
     return jsonify(tabell=table_array)
 
+
 @app.route('/getvarelinje')
 def getvarelinje():
 
@@ -116,6 +123,7 @@ def getvarelinje():
     linje_array = vareliste.selectrow(linje_id)
 
     return jsonify(linje=linje_array)
+
 
 @app.route('/getsortcolumn')
 def getsortcolumn():
@@ -130,8 +138,8 @@ def getsortcolumn():
 def getbestilling_liste():
 
     best_array = best.selecttable_bestillinger()
-
     return jsonify(tabell=best_array)
+
 
 @app.route('/poststatus', methods=["POST"])
 def lagre_status():
@@ -168,6 +176,18 @@ def view_enkelbest():
 
     except Exception as e:
         return render_template('login.html', error = e)
+
+
+@app.route('/postdeletebest', methods=['POST'])
+def delete_best():
+    try:
+        best_id = request.form('ID')
+        success = best.delete_bestilling(best_id)
+        render_template('')
+    except Exception as e:
+        return render_template('login.html', error = e)
+
+
 
 
 if __name__ == "__main__":
