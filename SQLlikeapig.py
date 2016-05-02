@@ -136,6 +136,23 @@ class MyPig:
         self.close(c, conn)
         return 'success'
 
+    def get_varearray(self, ident):
+
+        c, conn = self.open()
+        c.execute("SELECT Varer FROM bestillinger WHERE ID='%s'" % ident)
+        array = c.fetchone()
+        self.close(c, conn)
+        return array
+
+    def get_varetabell(self, id_array):
+        c, conn = self.open()
+        id_string = ",".join([str(i) for i in id_array])
+        c.execute("SELECT ID, Varegruppe, Merke, Modell, Utsalgspris FROM vareliste WHERE ID in (%s)" % id_string)
+
+        varetabell = c.fetchall()
+        self.close(c, conn)
+
+        return varetabell
     # ------------------------------------------ #
     """  FUNKSJONER TIL INNLOGGING  """
     # ----------------------------------------- #
@@ -147,6 +164,31 @@ class MyPig:
         data = c.fetchone()[2]
         self.close(c, conn)
         return data
+
+
+if __name__ == "__main__":
+    db = MyPigFarm()
+    vareliste = MyPig(db, 'vareliste')
+
+    array = vareliste.get_varearray('6')
+
+    array = array[0]
+    array = array.split(",")
+    print("after ", array)
+    vareid_array = []
+    antall_array = []
+    for i in range(0, len(array)):
+        if i % 2 != 0:
+            antall_array.append(array[i])
+        else:
+            vareid_array.append(array[i])
+
+    print("vareid_array ", vareid_array)
+    try:
+        varetabell = vareliste.get_varetabell(vareid_array)
+    except Exception as e: 
+        print("You had an error with get_varetabell " + str(e))
+    print(varetabell)
 
 
     """WORK IN PROGRESS

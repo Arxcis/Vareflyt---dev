@@ -1,1 +1,34 @@
 {% include 'header.html'%}
+
+<h2> Enkeltbestilling nr: {{ bestid }}</h2>
+
+<table class="table table-bordered table-striped">
+    <thead style="background-color: #70db70;">
+        <tr>
+            <th class="col-md-1">VareID</th>
+            <th class="col-md-2">Gruppe</th>
+            <th class="col-md-2">Merke</th>
+            <th class="col-md-4">Modell</th>
+            <th class="col-md-2">Pris</th> 
+            <th class="col-md-1">Antall</th> 
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in range(0, tabell|length) %}
+            <tr style="background-color: #fff">
+            {% for j in range(0, tabell[i]|length) %}
+                <td>
+                    {{ tabell[i][j] }}
+                </td>
+            {% endfor %}
+                <td>
+                {{ antall[i] }}
+                </td>
+            </tr> 
+        {% endfor %}
+    </tbody>
+</table>
+
+<button class="btn btn-success"><a href="{{ url_for('bestilling_liste') }} ">TILBAKE</a></button>
+
+{% include 'footer.html'%}

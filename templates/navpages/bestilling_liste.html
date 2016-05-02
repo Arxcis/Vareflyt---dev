@@ -4,14 +4,7 @@
 
     <h3>Bestillinger</h3>
 
-    <form class="form-horizontal">
-        <label class="col-md-1 control-label" for="searchinput">Søk</label>
-        <div id="searchbar" class="col-md-6">
-            <input id="searchfield" name="searchvare" type="search" placeholder="Tekst" class="form-control input-md" onkeyup="">
-        </div>
-    </form>
-
-    <table class="table">
+    <table class="table table-bordered table-striped">
         <thead>
             <tr style="background-color: #70db70;">
                 <th id="bestcolumn1" onClick="currentColumn(this.id)" class="col-md-1">BestID</th>
@@ -45,6 +38,7 @@
     var row_color = '';
     var row = '';
     var cell = '';
+    var dato_cell = '';
 
     function populateBesttabell(tabell) {
         /* The general function for displaying an array of cells
@@ -59,7 +53,8 @@
                     case 0:
                         div_id = cell;
                         div_id = $.trim(div_id);
-                        $('#besttabell').append('<tr class=\'eventlinje\' id=\'' + div_id + '\' ></tr>');
+                        $('#besttabell').append('<tr id="' + div_id + '"></tr>');
+                    
                         /* ON/OFF SWITCHBOX for the row background color*/ 
                         if (row_count % 2 === 0){
                             row_color = '#ffffff';
@@ -72,7 +67,7 @@
                         bryter = 1;
                         break;
                     case 1:
-                        $('#' + div_id).append('<td>' + div_id + '</td>');/*cell['ID']*/
+                        $('#' + div_id).append('<td><button><a href="/viewenkelbest?ID='+div_id+'">' + div_id + '</a></button></td>');/*cell['ID']*/
                         bryter = 2;
                         $('#' + div_id).append('<td>' + cell + '</td>');  /*cell['Navn']*/
                         break;
@@ -85,11 +80,15 @@
                         bryter = 4;
                         break;
                     case 4:
-                        $('#' + div_id).append('<td>' + cell + '</td>'); /*cell['opprettet']*/
+                        dato_cell = cell.split(", ")[1]
+                        dato_cell = dato_cell.substring(0, dato_cell.length - 7)
+                        $('#' + div_id).append('<td>' + dato_cell + '</td>'); /*cell['opprettet']*/
                         bryter = 5;
                         break;
                     case 5:
-                        $('#' + div_id).append('<td>' + cell + '</td>'); /*cell['sist oppdatert']*/
+                        dato_cell = cell.split(", ")[1]
+                        dato_cell = dato_cell.substring(0, dato_cell.length - 7)
+                        $('#' + div_id).append('<td>' + dato_cell + '</td>'); /*cell['sist oppdatert']*/
                         bryter = 6;
                         break;
                     case 6:
@@ -100,6 +99,8 @@
                                                  '{% if session["brukernavn"] == "admin" %}onClick="cloneButton(this.id){% endif %}" ' +
                                                  'class="'+ current +'">'+ cell + '' +
                                                  '</button></td>'); /*cell['STATUS']*/
+
+
                         bryter = 0;
                         break;
                     };

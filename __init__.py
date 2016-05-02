@@ -143,6 +143,32 @@ def lagre_status():
         return jsonify(result= "Server ERROR: " + str(e))
 
 
+@app.route('/viewenkelbest')
+def view_enkelbest():
+    try:
+        best_id = request.args.get('ID')
+
+        array = vareliste.get_varearray(best_id)
+
+        array = array[0]
+        array = array.split(",")
+        vareid_array = []
+        antall_array = []
+        for i in range(0, len(array)):
+            if i % 2 != 0:
+                antall_array.append(array[i])
+            else:
+                vareid_array.append(array[i])
+
+        varetabell = best.get_varetabell(vareid_array)
+        try:  
+            return render_template('views/enkelbestilling.html', bestid=best_id, tabell=varetabell, antall=antall_array)
+        except Exception as e:
+            return render_template('login.html', error = "HERE " + str(e))
+
+    except Exception as e:
+        return render_template('login.html', error = e)
+
 
 if __name__ == "__main__":
 	app.run()

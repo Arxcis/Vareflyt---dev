@@ -17,7 +17,7 @@
         </div>
     </form>
 
-    <table class="table">
+    <table class="table table-bordered table-striped">
         <thead>
             <tr style="background-color: #70db70;">
                 <th class="col-md-1">VareID</th>
@@ -57,7 +57,7 @@
         </fieldset>
     </form>
 
-    <table class="table">
+    <table class="table table-bordered table-striped">
         <thead>
             <tr style="background-color: #70db70; margin-top: 20pt;">
                 <th id="varecolumn1" onClick="currentColumn(this.id)" class="col-md-1">VareID</th>
@@ -82,41 +82,65 @@
     total_verdi = 0;
     best_row_count = 0;
     
+    var navn_bestiller = '';
+    var telefon_bestiller = '';
+    var varer_bestilling = [];
+    var verdi_bestilling = '';
+    var antall_bestilling = 0;
+    var vare_counter = 0;
+    var true_ID = '';
+
     function sendBestilling() {
 
-        var navn_bestiller = '';
-        var telefon_bestiller = '';
-        var vare_array = [];
-        var verdi_bestilling = '';
-        var antall = 0;
-
+        /* Nullstiller tidligere variabler*/
+        varer_bestilling = [];
+        antall_bestilling = 0;
         navn_bestiller = document.getElementById("inputnavn").value;
         telefon_bestiller = document.getElementById("inputtelefon").value;
         verdi_bestilling = total_verdi;
-
-        var vare_counter = 0;
-        var true_ID;
+  
         for (var key in bestillingslinjer) {
 
             true_ID = key.replace("selected", "");
-            vare_array[vare_counter] = [true_ID, bestillingslinjer[key][1]];
-            antall += parseInt(bestillingslinjer[key][1]);
+            varer_bestilling[vare_counter] = [true_ID, bestillingslinjer[key][1]];
+
+            antall_bestilling += parseInt(bestillingslinjer[key][1]);
             vare_counter += 1;
         };
+        
+        
+        if (navn_bestiller === "" || telefon_bestiller === "" || varer_bestilling.length < 1) {
+            $("#bestwarning").remove();
+            $("#bestillingskort").prepend('<h3 id="bestwarning" style="color:red;">Det mangler noe i bestillingen.</h3>');
+
+            return 0;
+        } else {
+
+        varer_bestilling = cleanArray(varer_bestilling);
 
         $.post("/postbestilling", {
                 'navn': String(navn_bestiller),
                 'telefon': String(telefon_bestiller),
-                'varer': String(vare_array),
+                'varer': String(varer_bestilling),
                 'verdi': String(verdi_bestilling),
-                'antall': String(antall)
+                'antall': String(antall_bestilling)
 
             }, function(data){
                 console.log("you recieved " + data.result);
                 window.location.assign('/bestliste');
         });
-
+        };
     };
+
+    function cleanArray(actual) {
+            var newArray = new Array();
+            for (var i = 0; i < actual.length; i++) {
+                if (actual[i]) {
+                  newArray.push(actual[i]);
+                }
+            }
+            return newArray;
+    }
 
     function sumBestilling() {
         total_verdi = 0;
@@ -125,7 +149,6 @@
             total_verdi += (bestillingslinjer[key][0] * bestillingslinjer[key][1]); 
         };
         $("#prislapp").text(String(total_verdi) + ",-");
-
     }
 
     function updateAntall(antall, ID) {
