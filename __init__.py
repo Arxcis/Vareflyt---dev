@@ -106,6 +106,7 @@ def view_enkelbest():
 
         notater = best.get_notes(best_id)
         array = best.get_varearray(best_id)
+        info = best.get_kundeinfo(best_id)
 
         array = array[0]
         array = array.split(",")
@@ -119,7 +120,11 @@ def view_enkelbest():
 
         varetabell = vareliste.get_varetabell(vareid_array)
         try:  
-            return render_template('views/enkelbestilling.html', bestid=best_id, tabell=varetabell, antall=antall_array, notater=notater)
+            return render_template('views/enkelbestilling.html', bestid=best_id, 
+                                                                tabell=varetabell, 
+                                                                antall=antall_array, 
+                                                                    notater=notater,
+                                                                    kundeinfo=info)
         except Exception as e:
             return render_template('login.html', error = "HERE " + str(e))
 

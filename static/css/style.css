@@ -22,3 +22,5 @@ h1 {text-decoration: none;}
 
 .eventlinje:hover {cursor: pointer;}
 
+#kundeinfo  {list-style-type: none; font-size: 16pt;}
+

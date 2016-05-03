@@ -1,6 +1,13 @@
 {% include 'header.html'%}
 
-<h2> Bestilling Nr: {{ bestid }}</h2>
+<div class="row">
+    <h2> Bestilling Nr: {{ bestid }}</h2>
+    <br/>
+        <ul id="kundeinfo">
+            <li> Kundenavn: {{ kundeinfo[0] }}</li>
+            <li> Telefon:  {{ kundeinfo[1] }}</li>
+        </ul>
+</div>
 
 <table class="table table-bordered table-striped">
     <thead style="background-color: #70db70;">
@@ -33,11 +40,16 @@
 
     <label class="col-md-4 control-label" for="textarea">Notat butikk</label>
     <div class="col-md-10">                     
-        <textarea class="form-control" id="notatbutikk" rowspan="3" name="notatbutikk">{{ notater[0][0] }}</textarea>
+        <textarea class="form-control" id="notatbutikk" rowspan="3" name="notatbutikk">{{ notater[0] }}</textarea>
     </div>
     <label class="col-md-4 control-label" for="textarea">Notat admin</label>
-    <div class="col-md-10">                     
-        <textarea class="form-control" {% if session['brukernavn'] == 'butikk' %} readonly="readonly" {% endif %} id="notatadmin" rowspan="3" name="notatadmin">{{ notater[0][1] }}</textarea>
+    <div class="col-md-10">       
+
+        <textarea class="form-control" 
+            {% if session['brukernavn'] == 'butikk' %} 
+                 readonly="readonly" style="background-color: #d9d9d9;"
+            {% endif %}
+                  id="notatadmin" rowspan="3" name="notatadmin">{{ notater[1] }}</textarea>
     </div>
 
     <div class="col-md-4" style="margin: 10pt;">

@@ -15,7 +15,6 @@ class MyPigFarm:
         self.use_unicode = True
         self.charset = 'utf8'
 
-
 class MyPig:
     def __init__(self, database, tabell):
         
@@ -180,11 +179,19 @@ class MyPig:
 
         c, conn = self.open()
         c.execute("SELECT Notat, NotatAdmin FROM bestillinger WHERE ID='%s'" % bestid)
-        notes = c.fetchall()
+        notes = c.fetchone()
         self.close(c, conn)
 
         return notes
 
+    def get_kundeinfo(self, bestid):
+
+        c, conn = self.open()
+        c.execute("SELECT Kundenavn, Telefon FROM bestillinger WHERE ID='%s'" % bestid)
+        info = c.fetchone()
+        self.close(c, conn)
+
+        return info
 
 
     # ------------------------------------------ #
