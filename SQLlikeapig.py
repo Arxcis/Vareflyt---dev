@@ -20,6 +20,7 @@ class MyPig:
         
         self.db = database
         self.tabell = tabell
+        self.columns = self.get_columns()
 
     def open(self):
         conn = MySQLdb.connect(host = self.db.host,
@@ -36,6 +37,43 @@ class MyPig:
         c.close()
         conn.close()
         gc.collect()
+
+    def get_columns(self):
+        c, conn = self.open()
+        columns = []
+        c.execute('DESCRIBE %s' % self.tabell)
+        fields_info = c.fetchall()
+
+        for i in range(0,len(fields_info)):
+            columns.append(fields_info[i][0])
+
+        self.close(c, conn)
+        return columns
+
+    def select(self, column_indexes, ID=''):
+        c, conn = self.open()
+
+        selected = []
+        column_string = ''
+        if column_indexes == '*':
+            column_string = column_indexes
+        else:
+            for index in column_indexes:
+                selected.append(self.columns[index])
+
+            column_string = ", ".join(selected)
+        
+        if ID == '':
+            print(column_string)
+            c.execute("SELECT %s FROM %s" % (column_string, self.tabell))
+            select_result = c.fetchall()
+
+        else:
+            c.execute("SELECT %s FROM %s WHERE ID='%s'" % (column_string, self.tabell, ID))
+            select_result = c.fetchone()
+
+        self.close(c, conn)
+        return select_result
 
 
     def format_tostring(self, array):
@@ -208,8 +246,9 @@ class MyPig:
 
 
 if __name__ == "__main__":
+
     db = MyPigFarm()
     vareliste = MyPig(db, 'vareliste')
 
-    print(vareliste.get_notes('44'))
-
+    ret = vareliste.select([0, 1,2,3,4,5,6,7,8,9,10], '100026')
+    print(ret)
