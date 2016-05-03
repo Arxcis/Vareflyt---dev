@@ -29,6 +29,7 @@ class MyPig:
 
     def get_columns(self):
         c, conn = self.open()
+        
         columns = []
         c.execute('DESCRIBE %s' % self.table)
         fields_info = c.fetchall()
@@ -95,6 +96,7 @@ class MyPig:
         return select_result
 
     def rowupdate(self, columns, values, rowid):
+    	c, conn = self.open()
 
         zipped_string = ''
         modvalue = ''
@@ -108,33 +110,28 @@ class MyPig:
         zipped_string = zipped_string[0:-2]
 
         sql = ("UPDATE %s SET " % self.table) + zipped_string + (" WHERE ID=%s" % rowid)
-
-        c, conn = self.open()
         c.execute(sql)
-        self.close(c, conn)
 
+        self.close(c, conn)
         return 'success'
 
-    # ------------------------------------------ #
-    """  FUNKSJONER TIL BESTILLING - SKJEMA  """
-    # ----------------------------------------- #
+    # ------ SPECIAL METHODS -> bestillingskjema.html ----
 
     def searchtable(self, string):
-        # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
         c, conn = self.open()
+
         c.execute("SELECT ID, Varegruppe, Merke, Modell, Utsalgspris "
                   "FROM vareliste WHERE CONCAT_WS"
                   "('', ID, Varegruppe, Merke, Modell, Utsalgspris) "
                   "LIKE '%" + string + "%'")
         array = c.fetchall()
+
         self.close(c, conn)
-      
         return array
 
     def lagre_bestilling(self, ny_bestilling):
-        # nybestilling is a dictionary of [navn, telefon, varer, verdi]
-        # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
         c, conn = self.open()
+
         c.execute("INSERT INTO bestillinger"
                   "(Kundenavn, Telefon, Varer, Verdi, Antall, Ny, status) "
                   "VALUES ('%s', '%s', '%s', '%s', '%s', "
@@ -144,53 +141,46 @@ class MyPig:
                   ny_bestilling['varer'],
                   ny_bestilling['verdi'],
                   ny_bestilling['antall']))
-        self.close(c, conn)
 
+        self.close(c, conn)
         return 'success'
 
-    # ------------------------------------------ #
-    """  FUNKSJONER TIL BESTILLINGSLISTE  """
-    # ----------------------------------------- #
+    # ------ SPECIAL METHODS -> bestillingsliste.html ----
 
     def select_multirows(self, id_array):
         c, conn = self.open()
+
         id_string = ",".join([str(i) for i in id_array])
         c.execute("SELECT ID, Varegruppe, Merke, Modell, Utsalgspris "
                   "FROM vareliste WHERE ID in (%s)" % id_string)
 
         varetabell = c.fetchall()
-        self.close(c, conn)
 
+        self.close(c, conn)
         return varetabell
 
-    # ------------------------------------------ #
-    """  FUNKSJONER TIL ENEKELBESTILLING - VIEW """
-    # ----------------------------------------- #
+    # ------ SPECIAL METHODS -> enkelbestilling.html ----
 
     def delete_bestilling(self, rowid):
-
         c, conn = self.open()
-        c.execute("DELETE FROM bestillinger WHERE ID=%s" % rowid)
-        self.close(c, conn)
 
+        c.execute("DELETE FROM bestillinger WHERE ID=%s" % rowid)
+
+        self.close(c, conn)
         return "success"
 
-    # ------------------------------------------ #
-    """  FUNKSJONER TIL INNLOGGING  """
-    # ----------------------------------------- #
+    # ------ SPECIAL METHODS -> login.html ----
 
     def select_ifusername(self, username):
-
         c, conn = self.open()
+
         c.execute("SELECT brukernavn FROM brukere WHERE brukernavn='%s'" % username)
         data = c.fetchone()
+
         self.close(c, conn)
         return data
 
     # ---------------------------------------------------
 
 if __name__ == "__main__":
-
-    db = MyPigFarm()
-    best = MyPig(db, 'bestillinger')
-    best.rowupdate(['Notat'], ['Det vare åtte ørti fjære'], '41')
+	print("Hei - haloooooo")
