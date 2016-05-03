@@ -162,6 +162,31 @@ class MyPig:
 
         return "success"
 
+    def save_butikknotes(self, bestid, note):
+        c, conn = self.open()
+        c.execute("UPDATE bestillinger SET Notat='%s' WHERE ID='%s'" % (note, bestid))
+        self.close(c, conn)
+
+        return "success"
+
+    def save_adminnotes(self, bestid, note):
+        c, conn = self.open()
+        c.execute("UPDATE bestillinger SET NotatAdmin='%s' WHERE ID='%s'" % (note, bestid))
+        self.close(c, conn)
+
+        return "success"
+
+    def get_notes(self, bestid):
+
+        c, conn = self.open()
+        c.execute("SELECT Notat, NotatAdmin FROM bestillinger WHERE ID='%s'" % bestid)
+        notes = c.fetchall()
+        self.close(c, conn)
+
+        return notes
+
+
+
     # ------------------------------------------ #
     """  FUNKSJONER TIL INNLOGGING  """
     # ----------------------------------------- #
@@ -179,66 +204,5 @@ if __name__ == "__main__":
     db = MyPigFarm()
     vareliste = MyPig(db, 'vareliste')
 
-    print(vareliste.delete_bestilling('36'))
-
-
-
-
-    """WORK IN PROGRESS
-
-    def bulk_update(self, file):
-        
-        c, conn = self.connect()
-        c.execute("DELETE FROM %s" % self.tabell)
-
-        self.close(c, conn)
-
-        stop = 10
-        with open(file, newline='') as csvfile:
-            vareliste = csv.reader(csvfile, delimiter=';')
-            # Build SQL query string
-            
-            for row in vareliste:
-                sql_string = "INSERT INTO vareliste VALUES("
-                for cell in row[0:stop]:
-
-                    sql_string += '\'' + cell + '\'' + ',' 
-                sql_string += '\'' + row[stop] + '\'' + ')'
-
-                if row[3] != "":
-                    # Format string
-                    if 'æ' or 'Æ' in sql_string:
-                        sql_string = sql_string.replace('æ', 'ae')
-                        sql_string = sql_string.replace('Æ', 'Ae')
-                    if 'ø' or 'Ø' in sql_string:
-                        sql_string = sql_string.replace('ø','oe')
-                        sql_string = sql_string.replace('Ø','Oe')
-                    if 'å' or 'Å' in sql_string:
-                        sql_string = sql_string.replace('å', 'aa')
-                        sql_string = sql_string.replace('Å', 'Aa')
-
-
-                    # Open, execute , close
-                    c, conn = self.connect()
-                    c.execute(sql_string)
-                    conn.commit()
-
-                    c.close()
-                    conn.close()
-                    gc.collect()
-
-        return "<h1> Vareliste UPDATED</h1>" """
-
-
-
-
-                
-
-
-
-
-
-
-
-
+    print(vareliste.get_notes('44'))
 

@@ -104,7 +104,8 @@ def view_enkelbest():
     try:
         best_id = request.args.get('ID')
 
-        array = vareliste.get_varearray(best_id)
+        notater = best.get_notes(best_id)
+        array = best.get_varearray(best_id)
 
         array = array[0]
         array = array.split(",")
@@ -116,15 +117,32 @@ def view_enkelbest():
             else:
                 vareid_array.append(array[i])
 
-        varetabell = best.get_varetabell(vareid_array)
+        varetabell = vareliste.get_varetabell(vareid_array)
         try:  
-            return render_template('views/enkelbestilling.html', bestid=best_id, tabell=varetabell, antall=antall_array)
+            return render_template('views/enkelbestilling.html', bestid=best_id, tabell=varetabell, antall=antall_array, notater=notater)
         except Exception as e:
             return render_template('login.html', error = "HERE " + str(e))
 
     except Exception as e:
         return render_template('login.html', error = e)
 
+
+@app.route('/postnotater', methods=['POST'])
+def post_notater():
+    try:
+        bestid = request.form['submit']
+
+        if request.form['notatbutikk']:
+            nbutikk = request.form['notatbutikk']
+            best.save_butikknotes(bestid, nbutikk)
+        if request.form['notatadmin']:
+            nadmin = request.form['notatadmin']
+            best.save_adminnotes(bestid, nadmin)
+
+        return redirect('/viewenkelbest?ID=' + bestid)
+
+    except Exception as e:
+        return render_template('login.html', error = e)
 
 # ---------- JAVASCRIPT AJAX ROUTES -------------
 # -------------------------------------------#
@@ -198,28 +216,5 @@ def delete_best():
         return render_template('login.html', error = e)
 
 
-
-
 if __name__ == "__main__":
 	app.run()
-
-"""WORK IN PROGRESS
-
-    This is a function that is supposed to run, 
-     when a file is uploaded. 
-      1. Take file. 
-      2. Format file. 
-      3. Delete excisting vareliste in MySql-database
-      4. Import new vareliste to MySql.
-
-@app.route('/vareupdate')
-def update_vareliste():
-    
-    filnavn = request.args.get('fil')
-    vareliste = SQLTable('vareliste')
-
-    success = vareliste.bulk_update('/home/eviate/mysite/uploads/%s.csv' % filnavn)
-    return success"""
-
-
-# set the secret key   

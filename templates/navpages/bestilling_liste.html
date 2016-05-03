@@ -7,13 +7,13 @@
     <table class="table table-bordered table-striped">
         <thead>
             <tr style="background-color: #70db70;">
-                <th id="bestcolumn1" onClick="currentColumn(this.id)" class="col-md-1">BestID</th>
-                <th id="bestcolumn2" onClick="currentColumn(this.id)" class="col-md-2">Kunde</th>
-                <th id="bestcolumn3" onClick="currentColumn(this.id)" class="col-md-1">Verdi</th>
-                <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-1">Varer</th>
-                <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-2">Opprettet</th> 
-                <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-2">Sist endret</th> 
-                <th id="bestcolumn4" onClick="currentColumn(this.id)" class="col-md-2" style="text-align:center;">STATUS</th>
+                <th id="bestcolumn1" class="col-md-1">BestID</th>
+                <th id="bestcolumn2" class="col-md-2">Kunde</th>
+                <th id="bestcolumn3" class="col-md-1">Verdi</th>
+                <th id="bestcolumn4" class="col-md-1">Varer</th>
+                <th id="bestcolumn4" class="col-md-2">Opprettet</th> 
+                <th id="bestcolumn4" class="col-md-2">Sist endret</th> 
+                <th id="bestcolumn4" class="col-md-2" style="text-align:center;">STATUS</th>
             </tr>
         </thead>
         <tbody id= "besttabell">
@@ -34,19 +34,13 @@
 
     var datetime = '';
     var dateint = 0; 
-    var timejustert = '';
     var resultstring = '';
 
     function formatTime(datetime){
         datetime = datetime.split(":").join(" ");
         datetime = datetime.split(" ");
-        dateint = parseInt(datetime[4]) + 6;
-        if (dateint > 23) {
-            timejustert = "0" + String(dateint - 24);
-        } else {
-            timejustert = String(dateint);
-        };
-        result = datetime[1] + ' ' +  datetime[2] + ' ' + datetime[3] + ' - ' + timejustert + ':' + datetime[5];
+
+        result = datetime[1] + ' ' +  datetime[2] + ' ' + datetime[3] + ' - ' + datetime[4] + ':' + datetime[5];
         return result;
     };  
 
