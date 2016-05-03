@@ -1,11 +1,11 @@
 {% include 'header.html'%}
 
-<div class="row">
+<div id="kundeinfo" class="row">
     <h2> Bestilling Nr: {{ bestid }}</h2>
     <br/>
-        <ul id="kundeinfo">
-            <li> Kundenavn: {{ kundeinfo[0] }}</li>
-            <li> Telefon:  {{ kundeinfo[1] }}</li>
+        <ul id="infoliste" class="col-md-2">
+            <li id="navninfo">  Kundenavn: {{ kundeinfo[0] }}</li>
+            <li id="telefoninfo"> Telefon:  {{ kundeinfo[1] }}</li>
         </ul>
 </div>
 

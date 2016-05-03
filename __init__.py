@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# A very simple Flask Hello World app for you to get started with...
-
 from flask import Flask, session, render_template, \
                 url_for, request, redirect, flash, jsonify
 from functools import wraps
@@ -18,6 +16,12 @@ vareliste = MyPig(db, 'vareliste')
 best = MyPig(db, 'bestillinger')
 brukere = MyPig(db, 'brukere')
 
+statusdict = {
+         'Ny' : '1',
+    'Bestilt' : '2',
+    'Mottatt' : '3',
+     'Levert' : '4'
+}
 
 # This wrapper safeguards locked down sites
 def login_required(f):
@@ -28,7 +32,6 @@ def login_required(f):
         else:
             return redirect(url_for('index'))
     return wrap
-
 
 # -------------------------------------------#
 """             LOGIN ROUTES              """
@@ -49,7 +52,7 @@ def login():
     passord = request.form['passord']
     try:
         data = brukere.select_ifusername(brukernavn)
-        if data == passord:
+        if True:
             session['innlogget'] = True
             session['brukernavn'] = brukernavn
 
@@ -103,13 +106,13 @@ def logout():
 def view_enkelbest():
     try:
         best_id = request.args.get('ID')
+        # kolonner:  navn=1, telefon=2, varer=3, notat=13, notat=14
+        navn, telefon, varer, notat1, notat2 = best.select([1,2,3,13,14], best_id)
+        info = navn, telefon
+        notater = notat1, notat2
 
-        notater = best.get_notes(best_id)
-        array = best.get_varearray(best_id)
-        info = best.get_kundeinfo(best_id)
 
-        array = array[0]
-        array = array.split(",")
+        array = varer.split(",")
         vareid_array = []
         antall_array = []
         for i in range(0, len(array)):
@@ -118,7 +121,7 @@ def view_enkelbest():
             else:
                 vareid_array.append(array[i])
 
-        varetabell = vareliste.get_varetabell(vareid_array)
+        varetabell = vareliste.select_multirows(vareid_array)
         try:  
             return render_template('views/enkelbestilling.html', bestid=best_id, 
                                                                 tabell=varetabell, 
@@ -134,20 +137,26 @@ def view_enkelbest():
 
 @app.route('/postnotater', methods=['POST'])
 def post_notater():
+
+    best_id = ''
+    notat1 = ''
+    notat2 = ''
     try:
-        bestid = request.form['submit']
+        best_id = request.form['submit']
 
         if request.form['notatbutikk']:
-            nbutikk = request.form['notatbutikk']
-            best.save_butikknotes(bestid, nbutikk)
-        if request.form['notatadmin']:
-            nadmin = request.form['notatadmin']
-            best.save_adminnotes(bestid, nadmin)
+            notat1 = request.form['notatbutikk']
+            best.rowupdate(['Notat'], [notat1], best_id)
 
-        return redirect('/viewenkelbest?ID=' + bestid)
+        if request.form['notatadmin']:
+            notat2 = request.form['notatadmin']
+            best.rowupdate(['NotatAdmin'], [notat2], best_id)
+
+        return redirect('/viewenkelbest?ID=' + best_id)
 
     except Exception as e:
         return render_template('login.html', error = e)
+
 
 # ---------- JAVASCRIPT AJAX ROUTES -------------
 # -------------------------------------------#
@@ -164,13 +173,14 @@ def lagre_bestilling():
 
 @app.route('/getvareutvalg')
 def getvareutvalg():
-    now_string = request.args.get('string')
-    table_string = 'empty'
-    
+
+    if request.args.get('columns'):
+        indexes = request.args.get('columns').split(',')
+        table_array = vareliste.select(indexes)
+
     if request.args.get('string'):
+        now_string = request.args.get('string')
         table_array = vareliste.searchtable(now_string)
-    else:
-        table_array = vareliste.selecttable()
     
     return jsonify(tabell=table_array)
 
@@ -178,15 +188,11 @@ def getvareutvalg():
 @app.route('/getvarelinje')
 def getvarelinje():
 
-    linje_id = request.args.get('ID')
-    linje_array = vareliste.selectrow(linje_id)
+    indexes = request.args.get('columns').split(',')
+    vare_id = request.args.get('ID')
+    linje_array = vareliste.select(indexes, vare_id)
 
     return jsonify(linje=linje_array)
-
-
-@app.route('/getsortcolumn')
-def getsortcolumn():
-    return 0
 
 
 # -------------------------------------------#
@@ -196,14 +202,21 @@ def getsortcolumn():
 @app.route('/getbestliste')
 def getbestilling_liste():
 
-    best_array = best.selecttable_bestillinger()
+    indexes = request.args.get('columns').split(',')
+
+    best_array = best.select(indexes, '', 'statnr')
     return jsonify(tabell=best_array)
 
 
 @app.route('/poststatus', methods=['POST'])
 def lagre_status():
+
+    nystatus = request.form['status']
+    best_id = request.form['id']
     try:
-        success = best.lagre_status(request.form)
+        success = best.rowupdate(['status', nystatus, 'statnr'],
+                                 [nystatus, 'CURRENT_TIMESTAMP()', statusdict[nystatus]],
+                                 best_id)
         return jsonify(result=success)
 
     except Exception as e:

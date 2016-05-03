@@ -7,6 +7,8 @@ import csv
 import gc
 
 class MyPigFarm:
+    # ------------ INITialize database ------------------
+
     def __init__(self):
         self.host = 'localhost'
         self.user = 'root'
@@ -15,12 +17,29 @@ class MyPigFarm:
         self.use_unicode = True
         self.charset = 'utf8'
 
+
 class MyPig:
-    def __init__(self, database, tabell):
+    # --------------- INITialize table  ------------------
+
+    def __init__(self, database, table):
         
         self.db = database
-        self.tabell = tabell
+        self.table = table
         self.columns = self.get_columns()
+
+    def get_columns(self):
+        c, conn = self.open()
+        columns = []
+        c.execute('DESCRIBE %s' % self.table)
+        fields_info = c.fetchall()
+
+        for i in range(0,len(fields_info)):
+            columns.append(fields_info[i][0])
+
+        self.close(c, conn)
+        return columns
+
+    # ------------- OPEN, CLOSE connection -------------
 
     def open(self):
         conn = MySQLdb.connect(host = self.db.host,
@@ -38,87 +57,78 @@ class MyPig:
         conn.close()
         gc.collect()
 
-    def get_columns(self):
-        c, conn = self.open()
-        columns = []
-        c.execute('DESCRIBE %s' % self.tabell)
-        fields_info = c.fetchall()
+    # ------------- GENERAL SQL-QUERY methods ---------------
 
-        for i in range(0,len(fields_info)):
-            columns.append(fields_info[i][0])
-
-        self.close(c, conn)
-        return columns
-
-    def select(self, column_indexes, ID=''):
+    def select(self, column_indexes, ID='', orderby=''):
         c, conn = self.open()
 
         selected = []
         column_string = ''
+
         if column_indexes == '*':
             column_string = column_indexes
         else:
             for index in column_indexes:
-                selected.append(self.columns[index])
+
+                true_index = int(index)
+                selected.append(self.columns[true_index])
 
             column_string = ", ".join(selected)
         
-        if ID == '':
-            print(column_string)
-            c.execute("SELECT %s FROM %s" % (column_string, self.tabell))
-            select_result = c.fetchall()
+        sql = "SELECT %s FROM %s" % (column_string, self.table)
+        where = " WHERE ID='%s'" % ID
+        order = " ORDER BY %s" % orderby
 
-        else:
-            c.execute("SELECT %s FROM %s WHERE ID='%s'" % (column_string, self.tabell, ID))
+        if ID != '':
+            sql += where
+            c.execute(sql)
             select_result = c.fetchone()
+        elif orderby != '':
+            sql += order
+            c.execute(sql)
+            select_result = c.fetchall()
+        else:
+            c.execute(sql)
+            select_result = c.fetchall()
 
         self.close(c, conn)
         return select_result
 
+    def rowupdate(self, columns, values, rowid):
 
-    def format_tostring(self, array):
-        table_s = str(array)
-        table_s = table_s.replace('(','')
-        table_s = table_s.replace(')','')
-        table_s = table_s.replace('\'','')
+        zipped_string = ''
+        modvalue = ''
 
-        return table_s
+        for column, value in zip(columns, values):
 
+            if value == 'CURRENT_TIMESTAMP()':
+                zipped_string += column + '=' + value + ', '
+            else:
+                zipped_string += column + '=\'' + value + '\', '
+        zipped_string = zipped_string[0:-2]
+
+        sql = ("UPDATE %s SET " % self.table) + zipped_string + (" WHERE ID=%s" % rowid)
+
+        c, conn = self.open()
+        c.execute(sql)
+        self.close(c, conn)
+
+        return 'success'
 
     # ------------------------------------------ #
     """  FUNKSJONER TIL BESTILLING - SKJEMA  """
     # ----------------------------------------- #
 
-    def selecttable(self):
-        # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
-        c, conn = self.open()
-        c.execute("SELECT Varenr, Varegruppe, Merke, Modell, Utsalgspris "
-                  "FROM vareliste") 
-        array = c.fetchall()
-        self.close(c, conn)
-
-        return array
-
     def searchtable(self, string):
         # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
         c, conn = self.open()
-        c.execute("SELECT Varenr, Varegruppe, Merke, Modell, Utsalgspris "
+        c.execute("SELECT ID, Varegruppe, Merke, Modell, Utsalgspris "
                   "FROM vareliste WHERE CONCAT_WS"
-                  "('', Varenr, Varegruppe, Merke, Modell, Utsalgspris) "
+                  "('', ID, Varegruppe, Merke, Modell, Utsalgspris) "
                   "LIKE '%" + string + "%'")
         array = c.fetchall()
         self.close(c, conn)
       
-        return array
-
-    def selectrow(self, identity):
-        # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
-        c, conn = self.open()
-        c.execute("SELECT Varenr, Merke, Modell, Utsalgspris FROM vareliste WHERE Varenr='%s'" % identity)
-        array = c.fetchall()
-        self.close(c, conn)
-
-        # ------ FORMAT to STRING -------
         return array
 
     def lagre_bestilling(self, ny_bestilling):
@@ -142,95 +152,28 @@ class MyPig:
     """  FUNKSJONER TIL BESTILLINGSLISTE  """
     # ----------------------------------------- #
 
-    def selecttable_bestillinger(self):
-        # --- OPEN, EXECUTE, FETCHALL, CLOSE ---
-        c, conn = self.open()
-        c.execute("SELECT ID, Kundenavn, Verdi, Antall, Ny, sist_oppdatert, status "
-                  "FROM bestillinger ORDER BY statnr, ID DESC") 
-        array = c.fetchall()
-        self.close(c, conn)
-
-        # ------ FORMAT to STRING -------
-        #return self.format_tostring(array)
-        return array
-
-    def lagre_status(self, ny_status):
-
-        dato_columns = {
-            'Ny': 1,
-            'Bestilt': 2,
-            'Mottatt' : 3,
-            'Levert' : 4  }
-
-        c, conn = self.open()
-        c.execute("UPDATE bestillinger SET status='%s', %s=CURRENT_TIMESTAMP(), "
-                  "statnr=%d WHERE ID='%s'" 
-                   % (ny_status['status'],
-                      ny_status['status'],
-                      dato_columns[ny_status['status']],
-                      ny_status['id']))
-
-        self.close(c, conn)
-        return 'success'
-
-    def get_varearray(self, ident):
-
-        c, conn = self.open()
-        c.execute("SELECT Varer FROM bestillinger WHERE ID='%s'" % ident)
-        array = c.fetchone()
-        self.close(c, conn)
-        return array
-
-    def get_varetabell(self, id_array):
+    def select_multirows(self, id_array):
         c, conn = self.open()
         id_string = ",".join([str(i) for i in id_array])
-        c.execute("SELECT Varenr, Varegruppe, Merke, Modell, Utsalgspris FROM vareliste WHERE Varenr in (%s)" % id_string)
+        c.execute("SELECT ID, Varegruppe, Merke, Modell, Utsalgspris "
+                  "FROM vareliste WHERE ID in (%s)" % id_string)
 
         varetabell = c.fetchall()
         self.close(c, conn)
 
         return varetabell
 
-    def delete_bestilling(self, ident):
+    # ------------------------------------------ #
+    """  FUNKSJONER TIL ENEKELBESTILLING - VIEW """
+    # ----------------------------------------- #
+
+    def delete_bestilling(self, rowid):
 
         c, conn = self.open()
-        c.execute("DELETE FROM bestillinger WHERE ID=%s" % ident)
+        c.execute("DELETE FROM bestillinger WHERE ID=%s" % rowid)
         self.close(c, conn)
 
         return "success"
-
-    def save_butikknotes(self, bestid, note):
-        c, conn = self.open()
-        c.execute("UPDATE bestillinger SET Notat='%s' WHERE ID='%s'" % (note, bestid))
-        self.close(c, conn)
-
-        return "success"
-
-    def save_adminnotes(self, bestid, note):
-        c, conn = self.open()
-        c.execute("UPDATE bestillinger SET NotatAdmin='%s' WHERE ID='%s'" % (note, bestid))
-        self.close(c, conn)
-
-        return "success"
-
-    def get_notes(self, bestid):
-
-        c, conn = self.open()
-        c.execute("SELECT Notat, NotatAdmin FROM bestillinger WHERE ID='%s'" % bestid)
-        notes = c.fetchone()
-        self.close(c, conn)
-
-        return notes
-
-    def get_kundeinfo(self, bestid):
-
-        c, conn = self.open()
-        c.execute("SELECT Kundenavn, Telefon FROM bestillinger WHERE ID='%s'" % bestid)
-        info = c.fetchone()
-        self.close(c, conn)
-
-        return info
-
 
     # ------------------------------------------ #
     """  FUNKSJONER TIL INNLOGGING  """
@@ -239,16 +182,15 @@ class MyPig:
     def select_ifusername(self, username):
 
         c, conn = self.open()
-        c.execute("SELECT * FROM brukere WHERE brukernavn='%s'" % username)
-        data = c.fetchone()[2]
+        c.execute("SELECT brukernavn FROM brukere WHERE brukernavn='%s'" % username)
+        data = c.fetchone()
         self.close(c, conn)
         return data
 
+    # ---------------------------------------------------
 
 if __name__ == "__main__":
 
     db = MyPigFarm()
-    vareliste = MyPig(db, 'vareliste')
-
-    ret = vareliste.select([0, 1,2,3,4,5,6,7,8,9,10], '100026')
-    print(ret)
+    best = MyPig(db, 'bestillinger')
+    best.rowupdate(['Notat'], ['Det vare åtte ørti fjære'], '41')

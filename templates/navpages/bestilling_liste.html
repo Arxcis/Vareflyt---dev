@@ -11,9 +11,9 @@
                 <th id="bestcolumn2" class="col-md-2">Kunde</th>
                 <th id="bestcolumn3" class="col-md-1">Verdi</th>
                 <th id="bestcolumn4" class="col-md-1">Varer</th>
-                <th id="bestcolumn4" class="col-md-2">Opprettet</th> 
-                <th id="bestcolumn4" class="col-md-2">Sist endret</th> 
-                <th id="bestcolumn4" class="col-md-2" style="text-align:center;">STATUS</th>
+                <th id="bestcolumn5" class="col-md-2">Opprettet</th> 
+                <th id="bestcolumn6" class="col-md-2">Sist endret</th> 
+                <th id="bestcolumn7" class="col-md-2" style="text-align:center;">STATUS</th>
             </tr>
         </thead>
         <tbody id= "besttabell">
@@ -25,12 +25,15 @@
 {% include 'footer.html' %}
 
 <script>
+
+    var best_columns = '0,1,5,4,6,7,11';
     /* INIT - FUNCTION */
     $(document).ready(function() {
-        $.getJSON('/getbestliste', function(data) {
+        $.getJSON('/getbestliste?columns='+ best_columns, function(data) {
           populateBesttabell(data.tabell);
         });  
     });
+
 
     var datetime = '';
     var dateint = 0; 
@@ -40,9 +43,10 @@
         datetime = datetime.split(":").join(" ");
         datetime = datetime.split(" ");
 
-        result = datetime[1] + ' ' +  datetime[2] + ' ' + datetime[3] + ' - ' + datetime[4] + ':' + datetime[5];
+        result = datetime[1]+ ' ' + datetime[2]+ ' ' +datetime[3]+ ' - ' +datetime[4]+ ':' +datetime[5];
         return result;
     };  
+
 
     var bryter = 0;
     var div_id = '';
@@ -116,6 +120,7 @@
             };
         };
 
+
     var new_button = '';
     var old_button = '';
     var button_parent = '';
@@ -144,6 +149,7 @@
         } 
     };
 
+
     var final_button = '';
     var newID = '';
     var new_status = '';
@@ -157,9 +163,9 @@
             bestillingID = buttonID.split('b')[0];
 
             $.post('/poststatus', {
-            'status': String(new_status),
-            'id': String(bestillingID)
-            }, function(data){
+                'status': String(new_status),
+                'id': String(bestillingID)
+                }, function(data){
                 console.log('you recieved ' + data.result);
 
                 if (data.result === 'success') {
