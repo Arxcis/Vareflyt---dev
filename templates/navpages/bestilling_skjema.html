@@ -93,8 +93,7 @@
                     function(data) { populateVareliste(data.tabell) };                           -->
 
 
-
-<script navn="bestillingsscript" type="text/javascript" language="javascript">
+<script name="bestillingsscript" type="text/javascript" language="javascript">
 
     bestillingslinjer = new Object();
     total_verdi = 0;
@@ -149,44 +148,6 @@
         };
     };
 
-    function cleanArray(actual) {
-            var newArray = new Array();
-            for (var i = 0; i < actual.length; i++) {
-                if (actual[i]) {
-                  newArray.push(actual[i]);
-                }
-            }
-            return newArray;
-    }
-
-    function sumBestilling() {
-        total_verdi = 0;
-
-        for (var key in bestillingslinjer) {
-            total_verdi += (bestillingslinjer[key][0] * bestillingslinjer[key][1]); 
-        };
-        $("#prislapp").text(String(total_verdi) + ",-");
-    }
-
-    function updateAntall(antall, ID) {
-        console.log("updateAntall on ID: " + String(ID));
-        bestillingslinjer[ID][1] = antall;
-        sumBestilling();
-    };
-
-    /* FUNCTION REMOVES A VARELINJE FROM BESTILLINGSKORT*/
-    function deleteVare(obj) {
-        /*EVENT onClick() --> element <i></i>*/
-        /*Formatting*/ 
-        var ID = String(obj.id);
-        IDvare = ID.replace('delete', '');
-
-        delete bestillingslinjer[IDvare];
-        $('#' + IDvare).remove();
-        sumBestilling();
-    };
-
-
     var nylinje = [];
     var row_color = '';
     var row_ID = '';
@@ -215,7 +176,7 @@
                 return 0;
 
             } else {
-                $('#'+ vareID).css({ 'background-color': '#80bfff' });
+                fadeColor(vareID);
                 /* Linjeelement with css styling*/
                 $('#bestillingstabell').append('<tr id="' + row_ID +'">' + '</tr>');
                 $('#' + row_ID).css({ 'background-color': row_color });
@@ -256,18 +217,75 @@
         });
     };
 
-</script>
+    function cleanArray(actual) {
+            var newArray = new Array();
+            for (var i = 0; i < actual.length; i++) {
+                if (actual[i]) {
+                  newArray.push(actual[i]);
+                }
+            }
+            return newArray;
+    }
 
-<script navn="søk_vareliste" type="text/javascript">
+    function sumBestilling() {
+        total_verdi = 0;
 
-    function searchForString(string){
-        $.getJSON('/getvareutvalg?string=' + string , function(data) {
+        for (var key in bestillingslinjer) {
+            total_verdi += (bestillingslinjer[key][0] * bestillingslinjer[key][1]); 
+        };
+        $("#prislapp").text(String(total_verdi) + ",-");
+    }
 
-            $("#varetabell").empty();
-            populateVareliste(data.tabell);
-        });
+    function updateAntall(antall, ID) {
+        console.log("updateAntall on ID: " + String(ID));
+        bestillingslinjer[ID][1] = antall;
+        sumBestilling();
     };
+
+    /* FUNCTION REMOVES A VARELINJE FROM BESTILLINGSKORT*/
+    function deleteVare(obj) {
+        /*EVENT onClick() --> element <i></i>*/
+        /*Formatting*/ 
+        var ID = String(obj.id);
+        IDvare = ID.replace('delete', '');
+
+        delete bestillingslinjer[IDvare];
+        $('#' + IDvare).remove();
+        sumBestilling();
+    };
+
+    var r = 0;
+    var g = 0; 
+    var b = 0;
+    var animeID = '';
+
+    function fadeColor(ID){
+        r = 128;
+        g = 191; 
+        b =  255;
+        animeID = ID;
+        old_color = document.getElementById(ID).style.backgroundColor;
+
+        function fadeAnimation() {
+
+            if (r <= 180 || g <= 220) { 
+                document.getElementById(animeID).style.backgroundColor = 
+                          'rgb('+ String(r) +', '+ String(Math.round(g)) +', ' + String(b) +')';
+                r += 2;
+                g += 1;
+
+                window.setTimeout(fadeAnimation, 10);
+            } else {
+                document.getElementById(ID).style.backgroundColor = old_color;
+            };
+        };
+        fadeAnimation();
+    };
+
+
+
 </script>
+
 
 <script name="vareliste_populate" type="text/javascript">
 
@@ -333,6 +351,22 @@
             };
         };
     };
+</script>
+
+<script name="søk_vareliste" type="text/javascript">
+
+    function searchForString(string){
+        $.getJSON('/getvareutvalg?string=' + string , function(data) {
+
+            $("#varetabell").empty();
+            populateVareliste(data.tabell);
+        });
+    };
+</script>
+
+<script name="animation" type="text/javascript">
+    
+
 </script>
 
 {% include 'footer.html' %}
