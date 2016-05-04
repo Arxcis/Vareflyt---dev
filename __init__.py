@@ -178,7 +178,7 @@ def getvareutvalg():
         indexes = request.args.get('columns').split(',')
         table_array = vareliste.select(indexes)
 
-    if request.args.get('string'):
+    elif request.args.get('string') or request.args.get('string') == '':
         now_string = request.args.get('string')
         table_array = vareliste.searchtable(now_string)
     
@@ -204,7 +204,7 @@ def getbestilling_liste():
 
     indexes = request.args.get('columns').split(',')
 
-    best_array = best.select(indexes, '', 'statnr')
+    best_array = best.select(indexes, '', 'statnr, ID DESC')
     return jsonify(tabell=best_array)
 
 

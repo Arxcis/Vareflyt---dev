@@ -133,11 +133,11 @@ class MyPig:
         c, conn = self.open()
 
         c.execute("INSERT INTO bestillinger"
-                  "(Kundenavn, Telefon, Varer, Verdi, Antall, Ny, status) "
+                  "(Kundenavn, Kontakt, Varer, Verdi, Antall, Ny, status) "
                   "VALUES ('%s', '%s', '%s', '%s', '%s', "
                   "CURRENT_TIMESTAMP(), 'Ny')"
                    % (ny_bestilling['navn'],
-                  ny_bestilling['telefon'],
+                  ny_bestilling['kontakt'],
                   ny_bestilling['varer'],
                   ny_bestilling['verdi'],
                   ny_bestilling['antall']))
