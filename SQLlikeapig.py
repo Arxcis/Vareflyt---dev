@@ -96,7 +96,7 @@ class MyPig:
         return select_result
 
     def rowupdate(self, columns, values, rowid):
-    	c, conn = self.open()
+        c, conn = self.open()
 
         zipped_string = ''
         modvalue = ''
@@ -133,14 +133,15 @@ class MyPig:
         c, conn = self.open()
 
         c.execute("INSERT INTO bestillinger"
-                  "(Kundenavn, Kontakt, Varer, Verdi, Antall, Ny, status) "
-                  "VALUES ('%s', '%s', '%s', '%s', '%s', "
+                  "(Kundenavn, Kontakt, Varer, Verdi, Antall, Signatur, Ny, status) "
+                  "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', "
                   "CURRENT_TIMESTAMP(), 'Ny')"
                    % (ny_bestilling['navn'],
                   ny_bestilling['kontakt'],
                   ny_bestilling['varer'],
                   ny_bestilling['verdi'],
-                  ny_bestilling['antall']))
+                  ny_bestilling['antall'],
+                  ny_bestilling['signatur']))
 
         self.close(c, conn)
         return 'success'
@@ -174,7 +175,7 @@ class MyPig:
     def select_ifusername(self, username):
         c, conn = self.open()
 
-        c.execute("SELECT brukernavn FROM brukere WHERE brukernavn='%s'" % username)
+        c.execute("SELECT * FROM brukere WHERE brukernavn='%s'" % username)
         data = c.fetchone()
 
         self.close(c, conn)
@@ -183,4 +184,8 @@ class MyPig:
     # ---------------------------------------------------
 
 if __name__ == "__main__":
-	print("Hei - haloooooo")
+    print("Hei - haloooooo")
+    db = MyPigFarm()
+    brukere = MyPig(db, 'brukere')
+
+    print(brukere.select_ifusername('admin')[2])

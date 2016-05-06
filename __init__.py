@@ -52,7 +52,7 @@ def login():
     passord = request.form['passord']
     try:
         data = brukere.select_ifusername(brukernavn)
-        if True:
+        if passord == data[2]:
             session['innlogget'] = True
             session['brukernavn'] = brukernavn
 
@@ -107,7 +107,7 @@ def view_enkelbest():
     try:
         best_id = request.args.get('ID')
         # kolonner:  navn=1, telefon=2, varer=3, notat=13, notat=14
-        navn, telefon, varer, notat1, notat2 = best.select([1,2,3,13,14], best_id)
+        navn, telefon, varer, notat1, notat2, signatur = best.select([1,2,3,13,14,15], best_id)
         info = navn, telefon
         notater = notat1, notat2
 
@@ -127,7 +127,8 @@ def view_enkelbest():
                                                                 tabell=varetabell, 
                                                                 antall=antall_array, 
                                                                     notater=notater,
-                                                                    kundeinfo=info)
+                                                                    kundeinfo=info,
+                                                                    sign=signatur)
         except Exception as e:
             return render_template('login.html', error = "HERE " + str(e))
 

@@ -22,8 +22,9 @@ h1 {text-decoration: none;}
 
 .eventlinje:hover {cursor: pointer;}
 
-
+#sokeresult  {color: red; text-align: right;}
 #infoliste {list-style-type: none; font-size: 14pt; display: flex; }
 #navninfo {background-color: #fff; margin: 5pt; padding: 5pt;}
-#telefoninfo {background-color: #fff; padding: 5pt; margin: 5pt;}
+#kontaktinfo {background-color: #fff; padding: 5pt; margin: 5pt;}
+#signatur {background-color: #fff; padding: 5pt; margin: 5pt;}
 
