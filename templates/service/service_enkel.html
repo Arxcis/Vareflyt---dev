@@ -1,0 +1,82 @@
+{% include 'header.html'%}
+    
+    <section id="serviceordrekort">
+
+          <!-- Form output: kundenavn, telefon, mail, varenavn, beskrivelse, signatur--> 
+            <form class="form-horizontal" action="/updateservice" method="post">
+            <!-- Form Name --> 
+            <legend>Serviceordre nr: {{ info[0] }}</legend>
+
+                <label class="col-md-1 control-label" >ServiceID</label>  
+                <div class="col-md-2">
+                    <input id="lockedfield2" readonly class="form-control input-md" type="text" name="serviceid" value="{{ info[0] }}">
+                </div>
+
+                <br/>
+                <br/>
+                <br/>
+
+                <!-- Kundeinfo-->
+                <div class="form-group">
+                      <label class="col-md-1 control-label">Kunde</label>  
+                      <div class="col-md-3">
+                        <input name="kundenavn" type="text" placeholder="Navn" class="form-control input-md" value="{{ info[1] }}">
+                        
+                       </div>
+
+                      <label class="col-md-1 control-label">Telefon</label>  
+                      <div class="col-md-2">
+                        <input name="telefon" type="text" placeholder="8 siffer" class="form-control input-md" value="{{ info[2] }}">
+                        
+                      </div>
+
+                      <label class="col-md-1 control-label">E-post</label>  
+                      <div class="col-md-3">
+                        <input name="mail" type="text" placeholder="something@somewhere.no" class="form-control input-md" value="{{ info[3] }}">
+                        
+                      </div>
+                <div>
+
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+
+                <!-- Vareinfo-->
+                <div class="form-group">
+                      <label class="col-md-1 control-label">Varenavn</label>  
+                      <div class="col-md-4">
+                      <input name="varenavn" type="text" class="form-control input-md" value="{{ info[5] }}">
+                        
+                      </div>
+                </div>
+
+                <div class="form-group">
+                      <label class="col-md-1 control-label">Beskrivelse</label>
+                      <div class="col-md-6">                     
+                        <textarea rows="6" class="form-control" name="beskrivelse">{{ info[6] }}</textarea>
+                      </div>
+                </div>
+
+            <br/>
+            <br/>
+
+
+                <!-- Signatur -->
+                <div class="form-group">
+                      <label class="col-md-1 control-label">Signatur</label>
+                      <div class="col-md-3">
+                      <input id="lockedfield1" readonly type="text" name="signatur" value="{{ info[4] }}" class="form-control input-md">
+                      </div>
+                </div>
+
+                <br/>
+                <br/>
+
+                <button type="submit" name="Submit" class="btn btn-success">OPPDATER</button>
+            </form>
+
+    </section>
+
+
+{% include 'footer.html'%}

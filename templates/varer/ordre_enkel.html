@@ -1,6 +1,15 @@
 {% include 'header.html'%}
 
-<h2> Bestilling Nr: {{ bestid }}</h2>
+<button class="btn btn-success"><a href="{{ url_for('varer') }} ">TILBAKE</a></button>
+<div id="kundeinfo" class="row">
+    <h2> Vareordre Nr: {{ bestid }}</h2>
+    <br/>
+        <ul id="infoliste" class="col-md-10">
+            <li id="navninfo">  Kundenavn: {{ kundeinfo[0] }}</li>
+            <li id="kontaktinfo"> Kontakt:  {{ kundeinfo[1] }}</li>
+            <li id="signatur"> Signatur: {{ sign }} </li>
+        </ul>
+</div>
 
 <table class="table table-bordered table-striped">
     <thead style="background-color: #70db70;">
@@ -31,13 +40,18 @@
 
 <form id="notisform" rowspan="3" action="/postnotater" method="post">
 
-    <label class="col-md-4 control-label" for="textarea">Notat butikk</label>
+    <label class="col-md-4 control-label" for="textarea">Kommentar butikk</label>
     <div class="col-md-10">                     
-        <textarea class="form-control" id="notatbutikk" rowspan="3" name="notatbutikk">{{ notater[0][0] }}</textarea>
+        <textarea rows="6" class="form-control" id="notatbutikk" rowspan="3" name="notatbutikk">{{ notater[0] }}</textarea>
     </div>
-    <label class="col-md-4 control-label" for="textarea">Notat admin</label>
-    <div class="col-md-10">                     
-        <textarea class="form-control" {% if session['brukernavn'] == 'butikk' %} readonly="readonly" {% endif %} id="notatadmin" rowspan="3" name="notatadmin">{{ notater[0][1] }}</textarea>
+    <label class="col-md-4 control-label" for="textarea">Kommentar admin</label>
+    <div class="col-md-10">       
+
+        <textarea rows="6" class="form-control" 
+            {% if session['brukernavn'] == 'butikk' %} 
+                 readonly="readonly" style="background-color: #d9d9d9;"
+            {% endif %}
+                  id="notatadmin" rowspan="3" name="notatadmin">{{ notater[1] }}</textarea>
     </div>
 
     <div class="col-md-4" style="margin: 10pt;">
@@ -48,9 +62,10 @@
 
 
 <div class="row">
-    <button class="btn btn-success"><a href="{{ url_for('bestilling_liste') }} ">TILBAKE</a></button>
+
+
     {% if session['brukernavn'] == 'admin' %}
-    <button class="btn btn-danger" onClick="deleteBestilling({{ bestid }})">SLETT</button>
+        <button class="btn btn-danger" onClick="deleteBestilling({{ bestid }})">SLETT</button>
     {% endif %}
 
 <script type="text/javascript">

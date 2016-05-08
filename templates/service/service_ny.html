@@ -1,0 +1,75 @@
+{% include 'header.html'%}
+    
+    <section id="serviceordrekort">
+
+      <!-- Form output: kundenavn, telefon, mail, varenavn, beskrivelse, signatur--> 
+        <form class="form-horizontal" action="/postserviceordre" method="post">
+        <!-- Form Name --> 
+        <legend>Ny serviceordre</legend>
+
+            <!-- Kundeinfo-->
+            <div class="form-group">
+                  <label class="col-md-1 control-label" for="kundenavn">Kunde</label>  
+                  <div class="col-md-3">
+                    <input id="kundenavn" name="kundenavn" type="text" placeholder="Navn" class="form-control input-md">
+                    
+                   </div>
+
+                  <label class="col-md-1 control-label" for="telefon">Telefon</label>  
+                  <div class="col-md-2">
+                    <input id="telefon" name="telefon" type="text" placeholder="8 siffer" class="form-control input-md">
+                    
+                  </div>
+
+                  <label class="col-md-1 control-label" for="mail">E-post</label>  
+                  <div class="col-md-3">
+                  <input id="mail" name="mail" type="text" placeholder="something@somewhere.no" class="form-control input-md">
+                    
+                  </div>
+            <div>
+
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+
+            <!-- Vareinfo-->
+            <div class="form-group">
+                  <label class="col-md-1 control-label" for="varenavn">Varenavn</label>  
+                  <div class="col-md-4">
+                  <input id="varenavn" name="varenavn" type="text" placeholder="" class="form-control input-md">
+                    
+                  </div>
+            </div>
+
+            <div class="form-group">
+                  <label class="col-md-1 control-label" for="beskrivelse">Beskrivelse</label>
+                  <div class="col-md-6">                     
+                    <textarea rows="6" class="form-control" id="beskrivelse" name="beskrivelse">default text</textarea>
+                  </div>
+            </div>
+
+        <br/>
+        <br/>
+
+
+            <!-- Signatur -->
+            <div class="form-group">
+                  <label class="col-md-1 control-label" for="selectbasic">Signatur</label>
+                  <div class="col-md-3">
+                    <select id="selectbasic" name="signatur" class="form-control">
+                      <option value="June">June</option>
+                      <option value="Robert">Robert</option>
+                      <option value="Nichlas">Nichlas</option>
+                    </select>
+                  </div>
+            </div>
+
+
+            <button type="submit" name="Submit" class="btn btn-success">START</button>
+        </form>
+
+    </section>
+
+
+{% include 'footer.html'%}

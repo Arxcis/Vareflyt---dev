@@ -1,0 +1,46 @@
+<!--  På denne siden vises en liste med alle serviceordrene -->
+<!--   Ordrene er sortert, først etter om ordren er ny, bestilt, mottat, levert
+         Deretter, så sorteres de etter når de ble opprettet.-->
+
+{% include 'header.html'%}
+
+    <button id="nyordrebutton"class="btn btn-success col-md-12"><a href="{{ url_for('nyordre')}}?pick=service">Ny serviceordre</a></button>  
+
+    <section id="besttabellkort">
+
+        <h3>Serviceordre</h3>
+
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr style="background-color: #70db70;">
+                    <th id="bestcolumn1" class="col-md-1">OrdreID</th>
+                    <th id="bestcolumn2" class="col-md-2">Kunde</th>
+                    <th id="bestcolumn5" class="col-md-2">Opprettet</th> 
+                    <th id="bestcolumn6" class="col-md-2">Sist endret</th> 
+                    <th id="bestcolumn7" class="col-md-2" style="text-align:center;">STATUS</th>
+                </tr>
+            </thead>
+            <tbody id= "besttabell">
+                {% for i in range(0, tabell|length) %}
+                    <tr style="background-color: #fff">
+
+                        <td>
+                           <button><a href="/enkelservice?id={{ tabell[i][0] }}"> {{ tabell[i][0] }}</a></button>
+                        </td>
+
+                    {% for j in range(1, tabell[i]|length) %}
+                        <td>
+                            {{ tabell[i][j] }}
+                        </td>
+                    {% endfor %}
+                    </tr> 
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+
+
+    </section>
+
+{% include 'footer.html'%}

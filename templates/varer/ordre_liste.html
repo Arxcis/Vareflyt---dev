@@ -1,36 +1,49 @@
+ 
+<!--  På denne siden vises en liste med alle ordrene -->
+<!--   Ordrene er sortert, først etter om ordren er ny, bestilt, mottat, levert
+         Deretter, så sorteres de etter når de ble opprettet.-->
+
 {% include 'header.html'%}
 
-<section id="besttabellkort" class="col-md-12">
+    <button id="nyordrebutton"class="btn btn-success col-md-12"><a href="{{ url_for('nyordre')}}?pick=vare">Ny vareordre</a></button>  
 
-    <h3>Bestillinger</h3>
+    <section id="besttabellkort">
 
-    <table class="table table-bordered table-striped">
-        <thead>
-            <tr style="background-color: #70db70;">
-                <th id="bestcolumn1" class="col-md-1">BestID</th>
-                <th id="bestcolumn2" class="col-md-2">Kunde</th>
-                <th id="bestcolumn3" class="col-md-1">Verdi</th>
-                <th id="bestcolumn4" class="col-md-1">Varer</th>
-                <th id="bestcolumn4" class="col-md-2">Opprettet</th> 
-                <th id="bestcolumn4" class="col-md-2">Sist endret</th> 
-                <th id="bestcolumn4" class="col-md-2" style="text-align:center;">STATUS</th>
-            </tr>
-        </thead>
-        <tbody id= "besttabell">
-            <!--function populateBesttabell(tabell) {} -->
-        </tbody>
-    </table>
-</section>
+        <h3>Vareordre</h3>
+
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr style="background-color: #70db70;">
+                    <th class="col-md-1">OrdreID</th>
+                    <th class="col-md-2">Kunde</th>
+                    <th class="col-md-1">Verdi</th>
+                    <th class="col-md-1">Varer</th>
+                    <th class="col-md-2">Opprettet</th> 
+                    <th class="col-md-2">Sist endret</th> 
+                    <th class="col-md-2" style="text-align:center;">STATUS</th>
+                </tr>
+            </thead>
+            <tbody id= "besttabell">
+                <!--function populateBesttabell(tabell) {} -->
+            </tbody>
+        </table>
+
+
+
+    </section>
 
 {% include 'footer.html' %}
 
 <script>
+
+    var best_columns = '0,1,5,4,7,6,11';
     /* INIT - FUNCTION */
     $(document).ready(function() {
-        $.getJSON('/getbestliste', function(data) {
+        $.getJSON('/getvareordreliste?columns='+ best_columns, function(data) {
           populateBesttabell(data.tabell);
         });  
     });
+
 
     var datetime = '';
     var dateint = 0; 
@@ -40,9 +53,10 @@
         datetime = datetime.split(":").join(" ");
         datetime = datetime.split(" ");
 
-        result = datetime[1] + ' ' +  datetime[2] + ' ' + datetime[3] + ' - ' + datetime[4] + ':' + datetime[5];
+        result = datetime[1]+ ' ' + datetime[2]+ ' ' +datetime[3]+ ' - ' +datetime[4]+ ':' +datetime[5];
         return result;
     };  
+
 
     var bryter = 0;
     var div_id = '';
@@ -79,7 +93,7 @@
                         bryter = 1;
                         break;
                     case 1:
-                        $('#' + div_id).append('<td><button><a href="/viewenkelbest?ID='+div_id+'">' + div_id + '</a></button></td>');/*cell['ID']*/
+                        $('#' + div_id).append('<td><button><a href="/enkelvareordre?ID='+div_id+'">' + div_id + '</a></button></td>');/*cell['ID']*/
                         bryter = 2;
                         $('#' + div_id).append('<td>' + cell + '</td>');  /*cell['Navn']*/
                         break;
@@ -103,18 +117,29 @@
                         break;
                     case 6:
                         current = buttonArray[cell][0];
-                        $('#' + div_id).append('<td class="row" style="text-align:center;">'+
+
+                        if (current_user == 'admin' || cell == 'Bestilt' || cell == 'Mottatt' ) {
+                            $('#' + div_id).append('<td class="row" style="text-align:center;">'+
                                                  '<button id="'+ div_id+'button" '+
                                                  'style="margin:auto;" type="button" ' +
-                                                 '{% if session["brukernavn"] == "admin" %}onClick="cloneButton(this.id){% endif %}" ' +
+                                                    'onClick="cloneButton(this.id)" ' + 
                                                  'class="'+ current +'">'+ cell + '' +
                                                  '</button></td>'); /*cell['STATUS']*/ 
+                        } else  {
+                            $('#' + div_id).append('<td class="row" style="text-align:center;">'+
+                                                 '<button id="'+ div_id+'button" '+
+                                                 'style="margin:auto;" type="button" ' +
+                                                 'class="'+ current +'">'+ cell + '' +
+                                                 '</button></td>'); /*cell['STATUS']*/ 
+                        };
                         bryter = 0;
                         break;
                     };
                 };
             };
         };
+
+    var current_user = '{{ session["brukernavn"] }}'
 
     var new_button = '';
     var old_button = '';
@@ -144,6 +169,7 @@
         } 
     };
 
+
     var final_button = '';
     var newID = '';
     var new_status = '';
@@ -157,9 +183,9 @@
             bestillingID = buttonID.split('b')[0];
 
             $.post('/poststatus', {
-            'status': String(new_status),
-            'id': String(bestillingID)
-            }, function(data){
+                'status': String(new_status),
+                'id': String(bestillingID)
+                }, function(data){
                 console.log('you recieved ' + data.result);
 
                 if (data.result === 'success') {
@@ -168,7 +194,7 @@
                     newID = buttonID.split('newStat')[0];
                     final_button.attr('id', newID);
 
-                    window.location.replace("/bestliste");
+                    window.location.replace("/varer");
                 };
             });
         } else {

@@ -25,24 +25,25 @@
             <h1>VAREFLYT<small> STEREO </small></h1>
     </header>
 
+    <!-- NAVIGASJON -->
     <div id="nav">
-    <nav class="navbar navbar-inverse">
-        <div class="container-fluid">
-            <ul class="nav navbar-nav">
-                <!-- possible to implement class=active -->
-                <li><a href="{{url_for('bestilling_liste')}}"> OVERSIKT </a></li>
-                <li><a href="{{url_for('bestilling_skjema')}}"> BESTILLING </a></li>
-                {% if session['brukernavn'] == 'admin' %}
-                <li><a href="{{url_for('uploadform')}}"> UPLOAD </a></li>
-                {% endif %}
-                <li><a href="#"> {{ session['brukernavn']}}</a></li>
-                <li><a href="{{url_for('logout')}}">LOGG UT</a></li>
-                
-                  
-            </ul>
-                
-        </div>
-    </nav>
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <ul class="nav navbar-nav">
+                    <!-- possible to implement class=active -->
+                    <li><a href="{{url_for('varer')}}"> VARER </a></li>
+                    <li><a href="{{url_for('service')}}"> SERVICE </a></li>
+                    {% if session['brukernavn'] == 'admin' %}
+                    <li><a href="{{url_for('update')}}"> UPDATE </a></li>
+                    {% endif %}
+                    <li><a href="#"> {{ session['brukernavn']}}</a></li>
+                    <li><a href="{{url_for('logout')}}">LOGG UT</a></li>
+                    
+                      
+                </ul>
+                    
+            </div>
+        </nav>
     </div>
       
       
