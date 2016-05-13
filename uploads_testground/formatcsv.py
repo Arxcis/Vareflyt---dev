@@ -31,18 +31,7 @@ def format_incomming(self, file):
 
         new_row = []
         for cell in row[0:stop]:
-            
-            if ',' in cell:
-                # Remove all commas from cell to check if cell can convert to int.
-                test = cell
-                test = test.replace(',','')
-                
-                try: 
-                    #try to change commas to periods in all numbers
-                    testint = int(test)
-                    cell = cell.replace(',','.')
-                except ValueError:
-                    cell = cell.replace(',','')
+
             new_row.append(cell)
 
         vareliste_mod.append(tuple(new_row))

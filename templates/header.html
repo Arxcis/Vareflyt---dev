@@ -33,9 +33,6 @@
                     <!-- possible to implement class=active -->
                     <li><a href="{{url_for('varer')}}"> VARER </a></li>
                     <li><a href="{{url_for('service')}}"> SERVICE </a></li>
-                    {% if session['brukernavn'] == 'admin' %}
-                    <li><a href="{{url_for('update')}}"> UPDATE </a></li>
-                    {% endif %}
                     <li><a href="#"> {{ session['brukernavn']}}</a></li>
                     <li><a href="{{url_for('logout')}}">LOGG UT</a></li>
                     

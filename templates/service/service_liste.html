@@ -4,37 +4,28 @@
 
 {% include 'header.html'%}
 
-    <button id="nyordrebutton"class="btn btn-success col-md-12"><a href="{{ url_for('nyordre')}}?pick=service">Ny serviceordre</a></button>  
-
-    <section id="besttabellkort">
+    <form action="{{ url_for('nyordre')}}" method="get">
+        <button id="nyservicebutton" class="btn col-md-12" type="submit" name="pick" value="service">
+                <h4>Ny serviceordre</h4>
+        </button>  
+    </form>
+    <section id="serviceabellkort">
 
         <h3>Serviceordre</h3>
 
         <table class="table table-bordered table-striped">
             <thead>
-                <tr style="background-color: #70db70;">
-                    <th id="bestcolumn1" class="col-md-1">OrdreID</th>
-                    <th id="bestcolumn2" class="col-md-2">Kunde</th>
-                    <th id="bestcolumn5" class="col-md-2">Opprettet</th> 
-                    <th id="bestcolumn6" class="col-md-2">Sist endret</th> 
-                    <th id="bestcolumn7" class="col-md-2" style="text-align:center;">STATUS</th>
+                <tr style="background-color: #c0392b; color: #fff;">
+                    <th class="col-md-1">OrdreID</th>
+                    <th class="col-md-2">Kunde</th>
+                    <th class="col-md-2">Vare</th> 
+                    <th class="col-md-2">Opprettet</th> 
+                    <th class="col-md-2">Sist endret</th> 
+                    <th class="col-md-2" style="text-align:center;">STATUS</th>
                 </tr>
             </thead>
-            <tbody id= "besttabell">
-                {% for i in range(0, tabell|length) %}
-                    <tr style="background-color: #fff">
-
-                        <td>
-                           <button><a href="/enkelservice?id={{ tabell[i][0] }}"> {{ tabell[i][0] }}</a></button>
-                        </td>
-
-                    {% for j in range(1, tabell[i]|length) %}
-                        <td>
-                            {{ tabell[i][j] }}
-                        </td>
-                    {% endfor %}
-                    </tr> 
-                {% endfor %}
+            <tbody id="servicetabell">
+                
             </tbody>
 
         </table>
@@ -44,3 +35,169 @@
     </section>
 
 {% include 'footer.html'%}
+
+
+
+<script>
+
+    var best_columns = '0,1,5,10,9,7';
+    /* INIT - FUNCTION */
+    $(document).ready(function() {
+        $.getJSON('/getserviceordre?columns='+ best_columns, function(data) {
+          populateBesttabell(data.tabell);
+        });  
+    });
+
+
+    var datetime = '';
+    var dateint = 0; 
+    var resultstring = '';
+
+    function formatTime(datetime){
+        datetime = datetime.split(":").join(" ");
+        datetime = datetime.split(" ");
+
+        result = datetime[1]+ ' ' + datetime[2]+ ' ' +datetime[3]+ ' - ' +datetime[4]+ ':' +datetime[5];
+        return result;
+    };  
+
+
+    var bryter = 0;
+    var div_id = '';
+    var row_count = 0;
+    var row_color = '';
+    var row = '';
+    var cell = '';
+    var dato_cell = '';
+
+    function populateBesttabell(tabell) {
+        /* The general function for displaying an array of cells
+            as vareliste and bestillingsliste */
+        for (i=0; i < tabell.length; i++) {
+            row = tabell[i];
+
+            for (j=0; j < row.length; j++){
+                cell = row[j];
+
+                switch(bryter) {
+                    case 0:
+                        div_id = cell;
+                        div_id = $.trim(div_id);
+                        $('#servicetabell').append('<tr id="' + div_id + '"></tr>');
+                    
+                        /* ON/OFF SWITCHBOX for the row background color*/ 
+                        if (row_count % 2 === 0){
+                            row_color = '#ffffff';
+                        } else { row_color = '#e6e6e6';
+                        };
+                        $('#' + div_id).css({ 
+                            'background-color' : row_color
+                        });
+                        row_count += 1;
+                        bryter = 1;
+                        break;
+                    case 1:
+                        $('#' + div_id).append('<td><a href="/enkelservice?id='+div_id+'">' + div_id + '</a></td>');
+                        bryter = 2;
+                        $('#' + div_id).append('<td>' + cell + '</td>');  /*cell['Navn']*/
+                        break;
+
+                    case 2:
+                        $('#' + div_id).append('<td>' + cell + '</td>'); /*cell['opprettet']*/
+                        bryter = 3;
+                        break;
+
+                    case 3:
+                        dato_cell = formatTime(cell);
+                        $('#' + div_id).append('<td>' + dato_cell + '</td>'); /*cell['opprettet']*/
+                        bryter = 4;
+                        break;
+                    case 4:
+                        dato_cell = formatTime(cell);
+                        $('#' + div_id).append('<td>' + dato_cell + '</td>'); /*cell['sist oppdatert']*/
+                        bryter = 5;
+                        break;
+                    case 5:
+                        current = buttonArray[cell][0];
+
+                        $('#' + div_id).append('<td class="row" style="text-align:center;">'+
+                                                 '<button id="'+ div_id+'button" '+
+                                                 'style="margin:auto;" type="button" ' +
+                                                    'onClick="cloneButton(this.id)" ' + 
+                                                 'class="'+ current +'">'+ cell + '' +
+                                                 '</button></td>'); /*cell['STATUS']*/ 
+
+                        bryter = 0;
+                        break;
+                    };
+                };
+            };
+        };
+
+
+    var current_user = '{{ session["brukernavn"] }}'
+    var new_button = '';
+    var old_button = '';
+    var button_parent = '';
+    var buttonArray = {'Ny': ['btn btn-danger', 'btn btn-warning', 'Påbegynt'],
+              'Påbegynt': ['btn btn-warning','btn btn-info', 'Fullført'],
+              'Fullført': ['btn btn-info', 'btn btn-primary', 'Henteklar'],
+              'Henteklar':['btn btn-primary', 'btn btn-success', 'Levert'],
+              'Levert' : ['btn btn-success'] 
+            }
+
+    function cloneButton(buttonID) {
+        old_button = $('#'+buttonID);
+
+        if (old_button.text() != 'Levert') {
+            button_parent = $('#'+buttonID).parent();
+            new_button = $('#'+buttonID).clone();
+            new_button.empty();
+
+            old_button.attr("onClick", "changeStatus(this.id)");
+            new_button.attr("id", buttonID + 'newStatus');
+            new_button.attr("onClick", "changeStatus(this.id)");
+            new_button.attr("class", buttonArray[old_button.text()][1]);
+            new_button.append(buttonArray[old_button.text()][2]);
+            button_parent.append(new_button);
+        } else {
+            return 0;
+        } 
+    };
+
+
+    var final_button = '';
+    var newID = '';
+    var new_status = '';
+    var bestillingID = '';
+
+    function changeStatus(buttonID){
+        final_button = $('#' + buttonID);
+
+        if (buttonID.indexOf('newStatus') > -1){
+            new_status = final_button.text();
+            bestillingID = buttonID.split('b')[0];
+
+            $.post('/postservicestatus', {
+                'status': String(new_status),
+                'id': String(bestillingID)
+                }, function(data){
+                console.log('you recieved ' + data.result);
+
+                if (data.result === 'success') {
+                    final_button.siblings().remove();
+                    final_button.attr('onClick', 'cloneButton(this.id)');
+                    newID = buttonID.split('newStat')[0];
+                    final_button.attr('id', newID);
+
+                    window.location.replace("/service");
+                };
+            });
+        } else {
+            console.log('Ny status er: ' +  final_button.text())
+            final_button.siblings().remove();
+            final_button.attr('onClick', 'cloneButton(this.id)');
+        };      
+    };
+
+</script>

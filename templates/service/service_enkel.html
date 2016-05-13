@@ -52,7 +52,7 @@
                 </div>
 
                 <div class="form-group">
-                      <label class="col-md-1 control-label">Beskrivelse</label>
+                      <label class="col-md-1 control-label">Bekrivelse og Logg</label>
                       <div class="col-md-6">                     
                         <textarea rows="6" class="form-control" name="beskrivelse">{{ info[6] }}</textarea>
                       </div>
@@ -72,11 +72,27 @@
 
                 <br/>
                 <br/>
-
-                <button type="submit" name="Submit" class="btn btn-success">OPPDATER</button>
+                <div id="buttons_enkelservice">
+                    <button type="submit" name="Submit" class="btn btn-success">LAGRE</button>
+                    {% if session['brukernavn'] == 'admin' %}
+                        <button class="btn btn-danger" onClick="deleteService({{ info[0] }})">SLETT</button>
+                    {% endif %}
+                </div>
             </form>
 
     </section>
+
+
+<script type="text/javascript">
+
+        function deleteService(ID) {
+        $.getJSON('/postdeleteservice?ID='+ID, function(data){
+            if (data.result === 'success') {
+                window.location.replace('/service');
+            };
+        });
+    };
+</script>
 
 
 {% include 'footer.html'%}

@@ -1,4 +1,3 @@
-
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
@@ -19,11 +18,21 @@ vareordre = MyPig(db, 'vareordre')
 serviceordre = MyPig(db, 'serviceordre')
 brukere = MyPig(db, 'brukere')
 
+
+# Konverters for the status-texts
 statusdict = {
          'Ny' : '1',
     'Bestilt' : '2',
     'Mottatt' : '3',
      'Levert' : '4'
+}
+
+servicedict = {
+    'Ny'    : '1',
+    u'Påbegynt' : '2',
+    u'Fullført' : '3',
+    'Henteklar' : '4',
+    'Levert' : '5'
 }
 
 # This wrapper safeguards locked down sites
@@ -171,6 +180,7 @@ def enkelservice():
 
 
 @app.route('/postnotater', methods=['POST'])
+@login_required
 def post_notater():
 
     ordre_id = ''
@@ -187,7 +197,7 @@ def post_notater():
             notat2 = request.form['notatadmin']
             vareordre.rowupdate(['NotatAdmin'], [notat2], ordre_id)
 
-        return redirect('/enkelvareordre?ID=' + ordre_id)
+        return redirect('/varer')
 
     except Exception as e:
         return render_template('login.html', error = e)
@@ -199,6 +209,7 @@ def post_notater():
 # -------------------------------------------#
 
 @app.route('/postvareordre', methods=["POST"])
+@login_required
 def lagre_vareordre():
 
     success = vareordre.lagre_vareordre(request.form)    
@@ -239,17 +250,27 @@ def vareordre_liste():
 
     indexes = request.args.get('columns').split(',')
 
-    ordre_array = vareordre.select(indexes, '', 'statnr, ID DESC')
+    ordre_array = vareordre.select(indexes, '', 'StatusNr, ID DESC')
     return jsonify(tabell=ordre_array)
+
+@app.route('/getserviceordre')
+def service_ordreliste():
+    try:
+        indexes = request.args.get('columns').split(',')
+        ordre_array = serviceordre.select(indexes, '', 'StatusNr, ID DESC')
+        return jsonify(tabell=ordre_array)
+    except Exception as e:
+        return render_template('login.html', error = e)
 
 
 @app.route('/poststatus', methods=['POST'])
+@login_required
 def lagre_status():
 
     nystatus = request.form['status']
     ordre_id = request.form['id']
     try:
-        success = vareordre.rowupdate(['status', nystatus, 'statnr'],
+        success = vareordre.rowupdate(['status', nystatus, 'StatusNr'],
                                  [nystatus, 'CURRENT_TIMESTAMP()', statusdict[nystatus]],
                                  ordre_id)
         return jsonify(result=success)
@@ -257,8 +278,25 @@ def lagre_status():
     except Exception as e:
         return jsonify(result= "Server ERROR: " + str(e))
 
+@app.route('/postservicestatus', methods=['POST'])
+@login_required
+def lagre_servicestatus():
+
+    nystatus = request.form['status']
+    ordre_id = request.form['id']
+    try:
+        success = serviceordre.rowupdate(['status', nystatus, 'StatusNr'],
+                                 [nystatus, 'CURRENT_TIMESTAMP()', servicedict[nystatus]],
+                                 ordre_id)
+        return jsonify(result=success)
+
+    except Exception as e:
+        return jsonify(result= "Server ERROR: " + str(e))
+
+
 
 @app.route('/postdeleteordre')
+@login_required
 def delete_ordre():
     try:
         ordre_id = request.args.get('ID')
@@ -269,6 +307,15 @@ def delete_ordre():
         return render_template('login.html', error = e)
 
 
+@app.route('/postdeleteservice')
+@login_required
+def delete_service():
+    try:
+        ordre_id = request.args.get('ID')
+        success = serviceordre.delete_service(ordre_id)
+        return jsonify(result = str(success))
+    except Exception as e:
+        return render_template('login.html', error = e)
 
 # -------------------------------------------#
 """    ROUTES FRA service/service_ny.html   """
@@ -276,6 +323,7 @@ def delete_ordre():
 
 
 @app.route('/postserviceordre', methods=['POST'])
+@login_required
 def lagre_serviceordre():
 
     try:
@@ -287,6 +335,7 @@ def lagre_serviceordre():
 
 
 @app.route('/updateservice', methods=['POST'])
+@login_required
 def update_service():
 
     success = serviceordre.rowupdate(['Navn', 'Telefon', 'Mail', 'Signatur', 'Varenavn', 'Beskrivelse'],

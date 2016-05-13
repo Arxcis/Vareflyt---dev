@@ -5,8 +5,7 @@ body {background-color: #333333;}
 
 
 h1 {text-decoration: none;}
-.container {border: 1pt solid black; background-color: 
- #cccccc;}
+.container {border: 1pt solid black; background-color: #d9d9d9;}
 .form-horizontal {margin-left: 5%; margin-bottom: 30pt;}
 #main {margin: 30pt 15pt 70pt 15pt;}
 #nav {border-bottom: 1pt solid black;}
@@ -15,31 +14,39 @@ a { text-decoration: none; font-size: 14pt; color: black;}
 a:hover {text-decoration: none; color: black;}
 header {margin: 20pt;}
 
+
 /*---------- VARER - APP ------------ */
+/* ordre_liste.html */
+#nyvarebutton {background-color: #c0392b; color: #fff; margin-top: 10pt; margin-bottom: 20pt;}
+
 /* ordre_ny.html*/
 #vareordrekort {border-bottom: 1pt solid #ccc; min-height: 200pt; background-color: #fff; padding: 15px; border-radius: 15px; box-shadow:5px 5px 5px 0px rgba(22,22,22,0.4);}
-#varetabellkort {background-color: #fff; padding: 15px; border-radius: 15px;  box-shadow:5px 5px 5px 0px rgba(22,22,22,0.4); margin-top: 50px; margin-bottom: 50px;}
-#sokeresult  {color: red; text-align: right;}
+#prislappdiv {background-color: #f2f2f2; padding-top: 3pt; padding-right: 10pt;}
+#varetabellkort {overflow:scroll; height:500pt; background-color: #fff; padding: 15px; border-radius: 15px;  box-shadow:5px 5px 5px 0px rgba(22,22,22,0.4); margin-top: 50px; margin-bottom: 50px;}
+#sokeresult  {background-color: #c0392b; color: #fff; text-align: right;}
 #sokeform {padding-bottom: 20pt;}
 .eventlinje:hover {cursor: pointer;}
 
 /* ordre_enkel.html*/
+#enkelbestilling {display: flex; flex-direction: column; flex: 1; border-bottom: 1pt solid #ccc; background-color: #fff; padding: 15px; border-radius: 15px; box-shadow:5px 5px 5px 0px rgba(22,22,22,0.4);}
+#kundeinfo {margin-left: 10pt; margin-top: 10pt;}
 #infoliste {list-style-type: none; font-size: 14pt; display: flex; }
 #navninfo {background-color: #fff; margin: 5pt; padding: 5pt;}
 #kontaktinfo {background-color: #fff; padding: 5pt; margin: 5pt;}
 #signatur {background-color: #fff; padding: 5pt; margin: 5pt;}
-
-
-/* ordre_liste.html */
-#nyordrebutton {margin-top: 10pt; margin-bottom: 20pt;}
-
+#buttons_enkelordre {margin: 20pt 0pt 15pt; display:flex; justify-content: space-around;}
 
 
 
 /* --------- SERVICE - APP  ----------*/
+/* service_liste.html*/
+#nyservicebutton {background-color: #c0392b; color: #fff; margin: 10pt 0pt 20pt;}
+
 /* service_ny.html*/
 #serviceordrekort {font-size: 12pt; border-bottom: 1pt solid #ccc; min-height: 200pt; background-color: #fff; padding: 15px; border-radius: 15px; box-shadow:5px 5px 5px 0px rgba(22,22,22,0.4);}
 
 /* service_enkel.html*/
 #lockedfield1 {background-color: #ffcccc;}
 #lockedfield2 {background-color: #ffcccc;}
+#buttons_enkelservice {display: flex; justify-content: space-around;}
+

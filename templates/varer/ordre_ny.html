@@ -1,16 +1,33 @@
 {% include 'header.html'%}
 
+<script type="text/javascript">
+
+    function autofyllButikk(){
+        document.getElementById("inputnavn").value = "Stereo butikk";
+        document.getElementById("inputtelefon").value = "56333902";
+        document.getElementById("inputmail").value = "post@stereomusikk.com";
+    }
+
+</script>
 
 
     <section id="vareordrekort">
 
         <h3> Ny vareordre </h3>
-        <form class="form-horizontal">
+        <form class="form-horizontal" onsubmit="return false;">
+            <!--Autocomplete button -->
+            <div class="form-group">
+                <label class="col-md-1 control-label" for="radios">Butikk</label>
+                <div class="col-md-3"> 
+                    <button class="btn btn-primary" onClick="autofyllButikk()">Autofyll</button>
+                </div>
+            </div>
+            </br>
           <!-- Text input-->
             <div class="form-group">
                 <label class="col-md-1 control-label" for="textinput">Navn</label>  
                 <div class="col-md-2">
-                    <input id="inputnavn" name="textinput" type="text" placeholder="Fornavn og Etternavn" class="form-control input-md" value="">
+                    <input id="inputnavn" name="textinput" type="text" placeholder="Fornavn og Etternavn" class="form-control input-md" value="" required>
                 </div>
                 <label class="col-md-1 control-label" for="textinput">Telefon</label>  
                 <div class="col-md-2">
@@ -38,9 +55,20 @@
             </div>
         </form>
 
+
+        <div class="col-md-12" style="margin-bottom: 10pt; display:flex; justify-content: flex-end;">
+            <div id="prislappdiv" class="col-md-2">
+                <p id="prislapp">0kr</p>
+            </div>
+            <div class="col-md-2">
+                <button id="bestillsubmit" name="bestillsubmit" class="btn btn-success" onClick="sendBestilling()">BESTILL</button>
+            </div>
+        </div>
+
+
         <table class="table table-bordered table-striped">
             <thead>
-                <tr style="background-color: #70db70;">
+                <tr style="background-color: #c0392b; color: #fff;">
                     <th class="col-md-1">VareID</th>
                     <th class="col-md-1">Merke</th>
                     <th class="col-md-4">Modell</th>
@@ -57,18 +85,13 @@
         </table>
             <!-- I have to do seomthing about the element below -->
             <!-- Maybe use flexbox -->
-        <div class="row col-md-4 col-md-offset-9" style="margin-bottom: 10pt;">
-            <div class="col-md-2" style=" background-color: #f2f2f2; padding-top: 3pt; padding-right: 10pt">
-                <p id="prislapp">0kr</p>
-            </div>
-            <div class="col-md-2">
-                <button id="bestillsubmit" name="bestillsubmit" class="btn btn-success" onClick="sendBestilling()">BESTILL</button>
-            </div>
-        </div>
+
     </section>
 
+
+
     <section id="varetabellkort" class="col-md-12">
-        <h3>Varetabell</h3>
+        <h3>Vareliste</h3>
 
             <!-- Search input-->
             <label class="col-md-1 control-label" for="searchinput">Søk</label>
@@ -76,12 +99,12 @@
                 <input id="searchfield" name="searchvare" type="search" placeholder="Tekst" class="form-control input-md" onkeyup="searchForString(this.value)">
             </div>
             <div class="col-md-5">
-                <h3 id="sokeresult"></h3>
+                <button id="sokeresult" class="btn"></button>
             </div>
 
         <table class="table table-bordered table-striped">
             <thead>
-                <tr style="background-color: #70db70; margin-top: 20pt;">
+                <tr style="background-color: #c0392b; color: #fff; margin-top: 20pt;">
                     <th id="varecolumn1" class="col-md-1">VareID</th>
                     <th id="varecolumn1" class="col-md-1">Gruppe</th>
                     <th id="varecolumn2" class="col-md-1">Merke</th>
@@ -89,11 +112,10 @@
                     <th id="varecolumn4" class="col-md-2">Utsalgspris</th>   
                 </tr>
             </thead>
+                <tbody id="varetabell">
 
-            <tbody id= "varetabell">
               <!--  function populateVareliste(liste) { } -->
-            </tbody>
-
+                </tbody>
         </table>
     </section>
 
@@ -147,10 +169,32 @@
     }
 
 
-    function updateAntall(antall, ID) {
-        console.log("updateAntall on ID: " + String(ID));
-        bestillingslinjer[ID][1] = antall;
-        sumBestilling();
+    var boolAntall = 0;
+
+    function wrongAntalls(){
+
+        for(var row in correct_antall)
+            if (!correct_antall[row]) {
+                return true;
+            };
+        return false;
+    };
+
+
+    var correct_antall = {};
+
+    function updateAntall(antall, bestID, rowID) {
+
+        if (isNaN(antall)) {
+            correct_antall[rowID] = false;
+            return 0;
+        } else {
+            correct_antall[rowID] = true;
+            bestillingslinjer[bestID][1] = antall;
+            sumBestilling();
+        };
+
+
     };
 
 
@@ -187,7 +231,7 @@
     var deleteID = '';
    
     function deleteVare(obj) {
-        /*EVENT onClick() --> element <i></i>*/  /* FUNCTION REMOVES A VARELINJE FROM BESTILLINGSKORT*/
+        /*EVENT onClick() --> element <i></i>*/  /* FUNCTION REMOVES A VARELINJE FROM VAREORDREKORT*/
         deleteID = String(obj.id);
         IDvare = deleteID.replace('delete', '');
 
@@ -231,9 +275,9 @@
             vare_counter += 1;
         };       
         
-        if (navn_bestiller === "" || kontakt_bestiller === "" || varer_bestilling.length < 1 || telefon_check.length != 8 || isNaN(telefon_check)) {
+        if (navn_bestiller === "" || kontakt_bestiller === "" || varer_bestilling.length < 1 || telefon_check.length != 8 || isNaN(telefon_check) || wrongAntalls()) {
             $("#bestwarning").remove();
-            $("#bestillingskort").prepend('<h3 id="bestwarning" style="color:red;">Noe er galt med bestilingen. </h3>');
+            $("#vareordrekort").prepend('<h3 id="bestwarning" style="color:red;">Noe er galt med bestilingen. </h3>');
 
             return 0;
         } else {
@@ -265,11 +309,11 @@
     var bestillingslinjer = [];
 
     function AddVare(vareID) {
-        /* FUNCTION ADDS A VARELINJE TO BESTILLINGSKORT*/ 
+        /* FUNCTION ADDS A VARELINJE TO VAREORDREKORT*/ 
         /* LINJECOLOR SWITCHBOX*/
 
         if (best_row_count % 2 === 0){
-            row_color = '#f2f2f2';
+            row_color = '#e6e6e6';
         } else {
             row_color = '#ffffff';
         };
@@ -300,21 +344,10 @@
 
                 $('#' + row_ID).append('<td>' + nylinje[2] + '</td>');
 
-                $('#' + row_ID).append('<td><form class="form-horizontal">' +
-                                         '<select name="' + row_ID +'" class="form-control" '+
-                                          'onchange="updateAntall(this.value, this.name)">' +
-                                          '<option value="1">1</option>' + 
-                                          '<option value="2">2</option>' +
-                                          '<option value="3">3</option>' +
-                                          '<option value="4">4</option>' +
-                                          '<option value="5">5</option>' +
-                                          '<option value="6">6</option>' +
-                                          '<option value="7">7</option>' +
-                                          '<option value="8">8</option>' +
-                                          '<option value="9">9</option>' +
-                                          '<option value="10">10</option>' +
-                                         '</select>' +
-                                       '</form></td>')
+                $('#' + row_ID).append('<td>' +
+                                         '<input id="antall'+row_ID+'" name="' + row_ID +'" class="form-control" '+
+                                          'onkeyup="updateAntall(this.value, this.name, this.id)" value="1">' +
+                                       '</td>')
 
                 $('#' + row_ID).append('<td>' + nylinje[3] + 'kr</td>');
              

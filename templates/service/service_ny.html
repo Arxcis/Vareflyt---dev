@@ -11,19 +11,19 @@
             <div class="form-group">
                   <label class="col-md-1 control-label" for="kundenavn">Kunde</label>  
                   <div class="col-md-3">
-                    <input id="kundenavn" name="kundenavn" type="text" placeholder="Navn" class="form-control input-md">
+                    <input id="kundenavn" name="kundenavn" type="text" placeholder="Navn" class="form-control input-md" required>
                     
                    </div>
 
                   <label class="col-md-1 control-label" for="telefon">Telefon</label>  
                   <div class="col-md-2">
-                    <input id="telefon" name="telefon" type="text" placeholder="8 siffer" class="form-control input-md">
+                    <input id="telefon" name="telefon" type="number" placeholder="8 siffer" class="form-control input-md" min="10000000" max="99999999" required>
                     
                   </div>
 
                   <label class="col-md-1 control-label" for="mail">E-post</label>  
                   <div class="col-md-3">
-                  <input id="mail" name="mail" type="text" placeholder="something@somewhere.no" class="form-control input-md">
+                  <input id="mail" name="mail" type="email" placeholder="something@somewhere.no" class="form-control input-md">
                     
                   </div>
             <div>
@@ -45,7 +45,7 @@
             <div class="form-group">
                   <label class="col-md-1 control-label" for="beskrivelse">Beskrivelse</label>
                   <div class="col-md-6">                     
-                    <textarea rows="6" class="form-control" id="beskrivelse" name="beskrivelse">default text</textarea>
+                    <textarea rows="6" class="form-control" id="beskrivelse" name="beskrivelse"></textarea>
                   </div>
             </div>
 
@@ -57,10 +57,16 @@
             <div class="form-group">
                   <label class="col-md-1 control-label" for="selectbasic">Signatur</label>
                   <div class="col-md-3">
+                  
                     <select id="selectbasic" name="signatur" class="form-control">
-                      <option value="June">June</option>
-                      <option value="Robert">Robert</option>
-                      <option value="Nichlas">Nichlas</option>
+                    {% if session['brukernavn'] == 'butikk' %}
+                        <option value="June">June</option>
+                        <option value="Robin">Robin</option>
+                        <option value="Nichlas">Nichlas</option>
+                    {% elif session['brukernavn'] == 'admin' %}
+                        <option value="Roger">Roger</option>
+                        <option value="Joakim">Joakim</option>
+                    {% endif %}
                     </select>
                   </div>
             </div>

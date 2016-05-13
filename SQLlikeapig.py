@@ -129,7 +129,7 @@ class MyPig:
         c.execute("SELECT ID, Varegruppe, Merke, Modell, Utsalgspris "
                   "FROM varer WHERE CONCAT_WS"
                   "('', ID, Varegruppe, Merke, Modell, Utsalgspris) "
-                  "LIKE '%" + string + "%' LIMIT 300")
+                  "LIKE '%" + string + "%'")
         array = c.fetchall()
 
         self.close(c, conn)
@@ -175,7 +175,7 @@ class MyPig:
         c, conn = self.open()
 
         id_string = ",".join([str(i) for i in id_array])
-        c.execute("SELECT ID, Varegruppe, Merke, Modell, Utsalgspris "
+        c.execute("SELECT ID, Leverandør, Artnr, Merke, Modell, Utsalgspris "
                   "FROM varer WHERE ID in (%s)" % id_string)
 
         varetabell = c.fetchall()
@@ -193,6 +193,14 @@ class MyPig:
         self.close(c, conn)
         return "success"
 
+    def delete_service(self, rowid):
+        c, conn = self.open()
+
+        c.execute("DELETE  FROM serviceordre WHERE ID=%s" % rowid)
+
+        self.close(c, conn)
+        return "success"
+
     # ------ SPECIAL METHODS -> login.html ----
 
     def select_ifusername(self, username):
@@ -204,68 +212,10 @@ class MyPig:
         self.close(c, conn)
         return data
 
-    """
-    # ---------BATCH UPDATE STUFF ----------------------
-
-
-    def format_incomming(self, file):  
-        stop = 11
-        vareliste = csv.reader((codecs.open(file, 'rb', 'ascii')), dialect='excel', delimiter=";")   
-        counter = 0
-
-
-        vareliste_mod = []
-
-        for row in vareliste:
-            
-            if counter == 0:
-                counter += 1
-                continue
-
-            new_row = []
-            for cell in row[0:stop]:
-                
-                if ',' in cell:
-                    # Remove all commas from cell to check if cell can convert to int.
-                    test = cell
-                    test = test.replace(',','')
-                    
-                    try: 
-                        #try to change commas to periods in all numbers
-                        testint = int(test)
-                        cell = cell.replace(',','.')
-                    except ValueError:
-                        cell = cell.replace(',','')
-                new_row.append(cell)
-
-            vareliste_mod.append(tuple(new_row))
-        return vareliste_mod
-
-
-    def batchupdate(self, filename):
-
-        c, conn = self.open()
-        sql = "DELETE FROM varer"
-        c.execute(sql) 
-        self.close(c, conn)
-
-        liste = self.format_incomming(filename)
-
-        c, conn = self.open()
-        sql = ("INSERT INTO varer "
-               "(Leverandør, Artnr, Merke, Modell, Varebeskrivelse, Varegruppe, Undergruppe, MVA, Nettopris, Utsalgspris, DG) "
-               "VALUES "
-               "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-
-        c.executemany(sql, liste)
-        self.close(c, conn)
-
-        return 'success'
-        """
 
 if __name__ == "__main__":
 
     db = MyPigFarm()
     utvalg = MyPig(db, 'varer')
 
-    print(utvalg.batchupdate('vareliste.csv'))
+    utvalg.batchupdate('vareliste-fixed.csv')

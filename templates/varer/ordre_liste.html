@@ -4,8 +4,11 @@
          Deretter, så sorteres de etter når de ble opprettet.-->
 
 {% include 'header.html'%}
-
-    <button id="nyordrebutton"class="btn btn-success col-md-12"><a href="{{ url_for('nyordre')}}?pick=vare">Ny vareordre</a></button>  
+    <form action="{{ url_for('nyordre')}}" method="get">
+        <button id="nyvarebutton" class="btn col-md-12" type="submit" name="pick" value="vare">
+                <h4>Ny vareordre</h4>
+        </button>  
+    </form>
 
     <section id="besttabellkort">
 
@@ -13,7 +16,7 @@
 
         <table class="table table-bordered table-striped">
             <thead>
-                <tr style="background-color: #70db70;">
+                <tr style="background-color: #c0392b; color: #fff">
                     <th class="col-md-1">OrdreID</th>
                     <th class="col-md-2">Kunde</th>
                     <th class="col-md-1">Verdi</th>
@@ -84,7 +87,7 @@
                         /* ON/OFF SWITCHBOX for the row background color*/ 
                         if (row_count % 2 === 0){
                             row_color = '#ffffff';
-                        } else { row_color = '#f2f2f2';
+                        } else { row_color = '#e6e6e6';
                         };
                         $('#' + div_id).css({ 
                             'background-color' : row_color
@@ -93,7 +96,7 @@
                         bryter = 1;
                         break;
                     case 1:
-                        $('#' + div_id).append('<td><button><a href="/enkelvareordre?ID='+div_id+'">' + div_id + '</a></button></td>');/*cell['ID']*/
+                        $('#' + div_id).append('<td><a href="/enkelvareordre?ID='+div_id+'">' + div_id + '</a></td>');/*cell['ID']*/
                         bryter = 2;
                         $('#' + div_id).append('<td>' + cell + '</td>');  /*cell['Navn']*/
                         break;
