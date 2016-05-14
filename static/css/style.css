@@ -2,7 +2,7 @@
 
 html, body {font-family: 'Roboto Condensed', sans-serif;}
 body {background-color: #333333;}
-
+header {margin: 20pt;}
 
 h1 {text-decoration: none;}
 .container {border: 1pt solid black; background-color: #d9d9d9;}
@@ -12,7 +12,7 @@ h1 {text-decoration: none;}
 
 a { text-decoration: none; font-size: 14pt; color: black;}
 a:hover {text-decoration: none; color: black;}
-header {margin: 20pt;}
+
 
 
 /*---------- VARER - APP ------------ */
@@ -20,12 +20,15 @@ header {margin: 20pt;}
 #nyvarebutton {background-color: #c0392b; color: #fff; margin-top: 10pt; margin-bottom: 20pt;}
 
 /* ordre_ny.html*/
+.eventlinje:hover {cursor: pointer;}
+.scrolltable {overflow:scroll; height:400pt;}
+
 #vareordrekort {border-bottom: 1pt solid #ccc; min-height: 200pt; background-color: #fff; padding: 15px; border-radius: 15px; box-shadow:5px 5px 5px 0px rgba(22,22,22,0.4);}
 #prislappdiv {background-color: #f2f2f2; padding-top: 3pt; padding-right: 10pt;}
-#varetabellkort {overflow:scroll; height:500pt; background-color: #fff; padding: 15px; border-radius: 15px;  box-shadow:5px 5px 5px 0px rgba(22,22,22,0.4); margin-top: 50px; margin-bottom: 50px;}
+#varetabellkort {background-color: #fff; padding: 15px; border-radius: 15px;  box-shadow:5px 5px 5px 0px rgba(22,22,22,0.4); margin-top: 50px; margin-bottom: 50px;}
 #sokeresult  {background-color: #c0392b; color: #fff; text-align: right;}
 #sokeform {padding-bottom: 20pt;}
-.eventlinje:hover {cursor: pointer;}
+
 
 /* ordre_enkel.html*/
 #enkelbestilling {display: flex; flex-direction: column; flex: 1; border-bottom: 1pt solid #ccc; background-color: #fff; padding: 15px; border-radius: 15px; box-shadow:5px 5px 5px 0px rgba(22,22,22,0.4);}

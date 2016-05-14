@@ -84,7 +84,7 @@ class MyPig:
         
         sql = "SELECT %s FROM %s" % (column_string, self.table)
         where = " WHERE ID='%s'" % ID
-        order = " ORDER BY %s" % orderby
+        order = " WHERE status!='Levert' ORDER BY %s" % orderby
 
         if ID != '':
             sql += where
@@ -130,6 +130,18 @@ class MyPig:
                   "FROM varer WHERE CONCAT_WS"
                   "('', ID, Varegruppe, Merke, Modell, Utsalgspris) "
                   "LIKE '%" + string + "%'")
+        array = c.fetchall()
+
+        self.close(c, conn)
+        return array
+
+    def searchvareordre(self, string):
+        c, conn = self.open()
+
+        c.execute("SELECT ID, Kundenavn, Verdi, Antall, Ny, sist_oppdatert, status "
+                  "FROM vareordre WHERE Kundenavn "
+                  "LIKE '%" + string + "%' "
+                  "ORDER BY StatusNr, ID DESC")
         array = c.fetchall()
 
         self.close(c, conn)

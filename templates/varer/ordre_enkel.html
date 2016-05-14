@@ -5,6 +5,7 @@
 
         <div id="kundeinfo" class="row">
             <h2> Vareordre Nr: {{ bestid }}</h2>
+            <h3> Status: {{ status }}</h3>
             <br/>
                 <ul id="infoliste" class="col-md-10">
                     <li id="navninfo">  Kundenavn: {{ kundeinfo[0] }}</li>
@@ -62,6 +63,8 @@
                     <button form="notisform" type="submit" name="submit" value="{{ bestid }}" class="btn btn-success">LAGRE</button>
 
                 {% if session['brukernavn'] == 'admin' %}
+                    <button class="btn btn-danger" onClick="deleteVareordre({{ bestid }})">SLETT</button>
+                {% elif session['brukernavn'] == 'butikk' and status == 'Ny' %} 
                     <button class="btn btn-danger" onClick="deleteVareordre({{ bestid }})">SLETT</button>
                 {% endif %}
             </div>

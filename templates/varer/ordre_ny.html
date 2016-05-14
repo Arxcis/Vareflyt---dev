@@ -1,15 +1,5 @@
 {% include 'header.html'%}
 
-<script type="text/javascript">
-
-    function autofyllButikk(){
-        document.getElementById("inputnavn").value = "Stereo butikk";
-        document.getElementById("inputtelefon").value = "56333902";
-        document.getElementById("inputmail").value = "post@stereomusikk.com";
-    }
-
-</script>
-
 
     <section id="vareordrekort">
 
@@ -97,26 +87,31 @@
             <label class="col-md-1 control-label" for="searchinput">Søk</label>
             <div id=sokeform class="col-md-5">
                 <input id="searchfield" name="searchvare" type="search" placeholder="Tekst" class="form-control input-md" onkeyup="searchForString(this.value)">
+                
             </div>
             <div class="col-md-5">
                 <button id="sokeresult" class="btn"></button>
             </div>
+            
+        <div class="scrolltable col-md-12">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr style="background-color: #c0392b; color: #fff; margin-top: 20pt;">
+                        <th id="varecolumn1" class="col-md-1">VareID</th>
+                        <th id="varecolumn1" class="col-md-1">Gruppe</th>
+                        <th id="varecolumn2" class="col-md-1">Merke</th>
+                        <th id="varecolumn3" class="col-md-4">Modell</th>
+                        <th id="varecolumn4" class="col-md-2">Utsalgspris</th>   
+                    </tr>
+                </thead>
 
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr style="background-color: #c0392b; color: #fff; margin-top: 20pt;">
-                    <th id="varecolumn1" class="col-md-1">VareID</th>
-                    <th id="varecolumn1" class="col-md-1">Gruppe</th>
-                    <th id="varecolumn2" class="col-md-1">Merke</th>
-                    <th id="varecolumn3" class="col-md-4">Modell</th>
-                    <th id="varecolumn4" class="col-md-2">Utsalgspris</th>   
-                </tr>
-            </thead>
                 <tbody id="varetabell">
 
-              <!--  function populateVareliste(liste) { } -->
+                  <!--  function populateVareliste(liste) { } -->
                 </tbody>
-        </table>
+
+            </table>
+        </div>
     </section>
 
 
@@ -141,7 +136,15 @@
                     function(data) { populateVareliste(data.tabell) };                           -->
 
 
+
 <script name="bestillingsscript" type="text/javascript" language="javascript">
+
+
+    function autofyllButikk(){
+        document.getElementById("inputnavn").value = "Stereo butikk";
+        document.getElementById("inputtelefon").value = "56333902";
+        document.getElementById("inputmail").value = "post@stereomusikk.com";
+    }
 
 
     var newArray = [];
@@ -169,8 +172,6 @@
     }
 
 
-    var boolAntall = 0;
-
     function wrongAntalls(){
 
         for(var row in correct_antall)
@@ -193,8 +194,6 @@
             bestillingslinjer[bestID][1] = antall;
             sumBestilling();
         };
-
-
     };
 
 

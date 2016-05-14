@@ -140,7 +140,7 @@ def enkelvareordre():
     try:
         ordre_id = request.args.get('ID')
         # kolonner:  navn=1, telefon=2, varer=3, notat=13, notat=14
-        navn, telefon, vareinfo, notat1, notat2, signatur = vareordre.select([1,2,3,13,14,15], ordre_id)
+        navn, telefon, vareinfo, notat1, notat2, signatur, status = vareordre.select([1,2,3,13,14,15,11], ordre_id)
         info = navn, telefon
         notater = notat1, notat2
 
@@ -155,13 +155,20 @@ def enkelvareordre():
                 vareid_array.append(array[i])
 
         varetabell = utvalg.select_multirows(vareid_array)
+
+        if request.args.get('type') == 'JSON':
+             return jsonify(varer=varetabell, 
+                            notater=notater, 
+                            antall=antall_array)    
+
         try:  
             return render_template('varer/ordre_enkel.html', bestid=ordre_id, 
                                                                 tabell=varetabell, 
                                                                 antall=antall_array, 
                                                                     notater=notater,
                                                                     kundeinfo=info,
-                                                                    sign=signatur)
+                                                                    sign=signatur, 
+                                                                    status=status)
         except Exception as e:
             return render_template('login.html', error = "HERE " + str(e))
 
@@ -179,33 +186,9 @@ def enkelservice():
     return render_template('service/service_enkel.html', info=serviceinfo)
 
 
-@app.route('/postnotater', methods=['POST'])
-@login_required
-def post_notater():
-
-    ordre_id = ''
-    notat1 = ''
-    notat2 = ''
-    try:
-        ordre_id = request.form['submit']
-
-        if request.form['notatbutikk']:
-            notat1 = request.form['notatbutikk']
-            vareordre.rowupdate(['Notat'], [notat1], ordre_id)
-
-        if request.form['notatadmin']:
-            notat2 = request.form['notatadmin']
-            vareordre.rowupdate(['NotatAdmin'], [notat2], ordre_id)
-
-        return redirect('/varer')
-
-    except Exception as e:
-        return render_template('login.html', error = e)
-
-
 # ---------- JAVASCRIPT AJAX ROUTES -------------
 # -------------------------------------------#
-"""    ROUTES FRA ORDRE - SKJEMA      """
+"""    ROUTES FRA varer/ordre_ny.html     """
 # -------------------------------------------#
 
 @app.route('/postvareordre', methods=["POST"])
@@ -250,17 +233,8 @@ def vareordre_liste():
 
     indexes = request.args.get('columns').split(',')
 
-    ordre_array = vareordre.select(indexes, '', 'StatusNr, ID DESC')
+    ordre_array = vareordre.select(indexes, '', "StatusNr, ID DESC")
     return jsonify(tabell=ordre_array)
-
-@app.route('/getserviceordre')
-def service_ordreliste():
-    try:
-        indexes = request.args.get('columns').split(',')
-        ordre_array = serviceordre.select(indexes, '', 'StatusNr, ID DESC')
-        return jsonify(tabell=ordre_array)
-    except Exception as e:
-        return render_template('login.html', error = e)
 
 
 @app.route('/poststatus', methods=['POST'])
@@ -278,22 +252,16 @@ def lagre_status():
     except Exception as e:
         return jsonify(result= "Server ERROR: " + str(e))
 
-@app.route('/postservicestatus', methods=['POST'])
-@login_required
-def lagre_servicestatus():
 
-    nystatus = request.form['status']
-    ordre_id = request.form['id']
-    try:
-        success = serviceordre.rowupdate(['status', nystatus, 'StatusNr'],
-                                 [nystatus, 'CURRENT_TIMESTAMP()', servicedict[nystatus]],
-                                 ordre_id)
-        return jsonify(result=success)
+@app.route('/searchvareordre')
+def search_vareordre():
 
-    except Exception as e:
-        return jsonify(result= "Server ERROR: " + str(e))
+    vareordre_table = vareordre.searchvareordre(request.args.get('string'))
+    return jsonify(tabell=vareordre_table)
 
-
+# -------------------------------------------#
+"""    ROUTES FRA varer/ordre_enkel.html   """
+# -------------------------------------------#
 
 @app.route('/postdeleteordre')
 @login_required
@@ -307,13 +275,26 @@ def delete_ordre():
         return render_template('login.html', error = e)
 
 
-@app.route('/postdeleteservice')
+@app.route('/postnotater', methods=['POST'])
 @login_required
-def delete_service():
+def post_notater():
+
+    ordre_id = ''
+    notat1 = ''
+    notat2 = ''
     try:
-        ordre_id = request.args.get('ID')
-        success = serviceordre.delete_service(ordre_id)
-        return jsonify(result = str(success))
+        ordre_id = request.form['submit']
+
+        if request.form['notatbutikk']:
+            notat1 = request.form['notatbutikk']
+            vareordre.rowupdate(['Notat'], [notat1], ordre_id)
+
+        if request.form['notatadmin']:
+            notat2 = request.form['notatadmin']
+            vareordre.rowupdate(['NotatAdmin'], [notat2], ordre_id)
+
+        return redirect('/varer')
+
     except Exception as e:
         return render_template('login.html', error = e)
 
@@ -344,8 +325,51 @@ def update_service():
 
     return redirect(url_for('service'))
 
-    #except Exception as e:
-        #return render_template('login.html', error = e)
+
+# -------------------------------------------#
+"""    ROUTES FRA service/service_liste.html   """
+# -------------------------------------------#
+
+@app.route('/getserviceordre')
+def service_ordreliste():
+    try:
+        indexes = request.args.get('columns').split(',')
+        ordre_array = serviceordre.select(indexes, '', 'StatusNr, ID DESC')
+        return jsonify(tabell=ordre_array)
+        
+    except Exception as e:
+        return render_template('login.html', error = e)
+
+@app.route('/postservicestatus', methods=['POST'])
+@login_required
+def lagre_servicestatus():
+
+    nystatus = request.form['status']
+    ordre_id = request.form['id']
+    try:
+        success = serviceordre.rowupdate(['status', nystatus, 'StatusNr'],
+                                 [nystatus, 'CURRENT_TIMESTAMP()', servicedict[nystatus]],
+                                 ordre_id)
+        return jsonify(result=success)
+
+    except Exception as e:
+        return jsonify(result= "Server ERROR: " + str(e))
+
+
+# -------------------------------------------#
+"""    ROUTES FRA service/service_enkel.html   """
+# -------------------------------------------#
+
+@app.route('/postdeleteservice')
+@login_required
+def delete_service():
+    try:
+        ordre_id = request.args.get('ID')
+        success = serviceordre.delete_service(ordre_id)
+        return jsonify(result = str(success))
+    except Exception as e:
+        return render_template('login.html', error = e)
+
 
 
 if __name__ == "__main__":

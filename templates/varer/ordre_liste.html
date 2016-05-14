@@ -1,7 +1,6 @@
- 
 <!--  På denne siden vises en liste med alle ordrene -->
-<!--   Ordrene er sortert, først etter om ordren er ny, bestilt, mottat, levert
-         Deretter, så sorteres de etter når de ble opprettet.-->
+<!--   Ordrene er sortert, først etter om ordren er ny, bestilt, mottat, levert -->
+         <!-- Deretter, så sorteres de etter når de ble opprettet.-->
 
 {% include 'header.html'%}
     <form action="{{ url_for('nyordre')}}" method="get">
@@ -10,7 +9,16 @@
         </button>  
     </form>
 
-    <section id="besttabellkort">
+    <label class="col-md-1 control-label" for="searchinput">Søk</label>
+    <div id=sokeform class="col-md-5">
+        <input id="searchfield" name="searchvare" type="search" placeholder="Navn" class="form-control input-md" onkeyup="searchForString(this.value)">
+                
+    </div>
+    <div class="col-md-5">
+        <button id="sokeresult" class="btn"></button>
+    </div>
+
+    <section id="ordretabellkort" class="col-md-12">
 
         <h3>Vareordre</h3>
 
@@ -26,8 +34,8 @@
                     <th class="col-md-2" style="text-align:center;">STATUS</th>
                 </tr>
             </thead>
-            <tbody id= "besttabell">
-                <!--function populateBesttabell(tabell) {} -->
+            <tbody id="ordretabell">
+                <!--function populateOrdretabell(tabell) {} -->
             </tbody>
         </table>
 
@@ -35,15 +43,18 @@
 
     </section>
 
+
 {% include 'footer.html' %}
 
+
 <script>
+
 
     var best_columns = '0,1,5,4,7,6,11';
     /* INIT - FUNCTION */
     $(document).ready(function() {
         $.getJSON('/getvareordreliste?columns='+ best_columns, function(data) {
-          populateBesttabell(data.tabell);
+          populateOrdretabell(data.tabell);
         });  
     });
 
@@ -61,87 +72,90 @@
     };  
 
 
-    var bryter = 0;
-    var div_id = '';
-    var row_count = 0;
-    var row_color = '';
-    var row = '';
-    var cell = '';
-    var dato_cell = '';
 
-    function populateBesttabell(tabell) {
-        /* The general function for displaying an array of cells
-            as vareliste and bestillingsliste */
-        for (i=0; i < tabell.length; i++) {
-            row = tabell[i];
+    /* HIDDEN ROW LOGIC*/
+    var enkelrow;
+    var countTo = 0;
+    var hide_orShow = '';
 
-            for (j=0; j < row.length; j++){
-                cell = row[j];
+    function structHiddenrow(ID) {
 
-                switch(bryter) {
-                    case 0:
-                        div_id = cell;
-                        div_id = $.trim(div_id);
-                        $('#besttabell').append('<tr id="' + div_id + '"></tr>');
-                    
-                        /* ON/OFF SWITCHBOX for the row background color*/ 
-                        if (row_count % 2 === 0){
-                            row_color = '#ffffff';
-                        } else { row_color = '#e6e6e6';
-                        };
-                        $('#' + div_id).css({ 
-                            'background-color' : row_color
-                        });
-                        row_count += 1;
-                        bryter = 1;
-                        break;
-                    case 1:
-                        $('#' + div_id).append('<td><a href="/enkelvareordre?ID='+div_id+'">' + div_id + '</a></td>');/*cell['ID']*/
-                        bryter = 2;
-                        $('#' + div_id).append('<td>' + cell + '</td>');  /*cell['Navn']*/
-                        break;
-                    case 2:
-                        $('#' + div_id).append('<td>' + cell + ',-</td>'); /*cell['Verdi']*/
-                        bryter = 3;
-                        break;
-                    case 3:
-                        $('#' + div_id).append('<td>' + cell + '</td>'); /*cell['Varer']*/
-                        bryter = 4;
-                        break;
-                    case 4:
-                        dato_cell = formatTime(cell);
-                        $('#' + div_id).append('<td>' + dato_cell + '</td>'); /*cell['opprettet']*/
-                        bryter = 5;
-                        break;
-                    case 5:
-                        dato_cell = formatTime(cell);
-                        $('#' + div_id).append('<td>' + dato_cell + '</td>'); /*cell['sist oppdatert']*/
-                        bryter = 6;
-                        break;
-                    case 6:
-                        current = buttonArray[cell][0];
+        function voidStructure() {
+            /*Create the hidden row structure.*/
+            $('#ordretabell').append('<tr id="hidden'+ID+'" class="collapse '+hide_orShow+'">'+
+                                    '<td colspan=3>'+
+                                    '<div id="hidden1'+ID+'" style="display:flex; flex-direction: column; align-items: center;"></div>'+
+                                    '</td>'+
+                                    '<td colspan=4>' +
+                                    '<div id="hidden2'+ID+'" style="display:flex; flex-direction: column; align-items:flex-start;"></div>' +
+                                    '</td>' +
+                                    '</tr>');
 
-                        if (current_user == 'admin' || cell == 'Bestilt' || cell == 'Mottatt' ) {
-                            $('#' + div_id).append('<td class="row" style="text-align:center;">'+
-                                                 '<button id="'+ div_id+'button" '+
-                                                 'style="margin:auto;" type="button" ' +
-                                                    'onClick="cloneButton(this.id)" ' + 
-                                                 'class="'+ current +'">'+ cell + '' +
-                                                 '</button></td>'); /*cell['STATUS']*/ 
-                        } else  {
-                            $('#' + div_id).append('<td class="row" style="text-align:center;">'+
-                                                 '<button id="'+ div_id+'button" '+
-                                                 'style="margin:auto;" type="button" ' +
-                                                 'class="'+ current +'">'+ cell + '' +
-                                                 '</button></td>'); /*cell['STATUS']*/ 
-                        };
-                        bryter = 0;
-                        break;
-                    };
-                };
-            };
         };
 
+        if (countTo < 3) {
+            hide_orShow = 'in';
+            voidStructure();
+            populateHiddenrow(ID);
+            countTo += 1;
+        } else if (countTo == 3) {
+            hide_orShow = 'out';
+            voidStructure();
+        } else {
+            voidStructure();
+        };
+
+    };
+
+
+    function populateHiddenrow(ID) {
+        /*Fill the structure with relevant data when row is displayed.*/
+        $.getJSON('/enkelvareordre?ID='+ ID + '&type=JSON', function(data) {
+            
+            ordre_varer = data.varer;
+            for (i=0; i < ordre_varer.length; i++) {
+                enkelrow = ordre_varer[i];
+
+                $('#hidden1'+ID).append('<p>'+enkelrow[1]+'</p>');
+                $('#hidden2'+ID).append('<div style="white-space:pre; display:flex; justify-content:center;">'+
+                                        '<p> ' + enkelrow[3] + ' </p>'+
+                                        '<p>   -    ' + enkelrow[2] + ' </p>'+  
+                                        '<p>   -    ' + enkelrow[4] + ' </p>'+
+                                        '<p>   -    ' + enkelrow[5] +' kr </p>' +
+                                        '<p>   x  ' + data.antall[i] + '</p>' + 
+                                        '</div>');
+            };
+
+            if (data.notater[0] != null && data.notater[0] != '' && data.notater[0] != 'None') {
+                $('#hidden1'+ID).append('<p></p>');
+                $('#hidden2'+ID).append('<p>Butikk: '+data.notater[0]+'</p>');
+            };
+            if (data.notater[1] != null && data.notater[1] != '' && data.notater[1] != 'None') {
+                $('#hidden1'+ID).append('<p></p>');
+                $('#hidden2'+ID).append('<p>Admin: '+data.notater[1]+'</p>');
+            };
+        });
+    };
+
+
+    function showhideRow(ID) {
+        var hiddenID = '#hidden'+ID;
+        if($(hiddenID).hasClass("out")) {
+            populateHiddenrow(ID);
+            $(hiddenID).addClass("in");
+            $(hiddenID).removeClass("out");
+            
+        } else {
+            $('#hidden1'+ID).empty();
+            $('#hidden2'+ID).empty();
+            $(hiddenID).addClass("out");
+            $(hiddenID).removeClass("in");
+        };
+
+    };
+
+
+    /* BUTTON LOGIC */
     var current_user = '{{ session["brukernavn"] }}'
 
     var new_button = '';
@@ -189,7 +203,6 @@
                 'status': String(new_status),
                 'id': String(bestillingID)
                 }, function(data){
-                console.log('you recieved ' + data.result);
 
                 if (data.result === 'success') {
                     final_button.siblings().remove();
@@ -207,4 +220,109 @@
         };      
     };
 
+
+    /* MAIN TABLE FUNCTION*/
+    var bryter = 0;
+    var div_id = '';
+    var row_count = 0;
+    var row_color = '';
+    var row = '';
+    var cell = '';
+    var dato_cell = '';
+
+    function populateOrdretabell(tabell) {
+        /* The general function for displaying an array of cells
+            as vareliste and bestillingsliste */
+        for (i=0; i < tabell.length; i++) {
+            row = tabell[i];
+
+            for (j=0; j < row.length; j++){
+                cell = row[j];
+
+                switch(bryter) {
+                    case 0:
+                        div_id = cell;
+                        div_id = $.trim(div_id);
+                        $('#ordretabell').append('<tr id="' + div_id + '"></tr>');
+                        structHiddenrow(div_id);
+                    
+                        /* ON/OFF SWITCHBOX for the row background color*/ 
+                        if (row_count % 2 === 0){
+                            row_color = '#ffffff';
+                        } else { row_color = '#e6e6e6';
+                        };
+                        $('#' + div_id).css({ 
+                            'background-color' : row_color
+                        });
+                        $('#hidden' + div_id).css({ 
+                            'background-color' : row_color
+                        });
+                        row_count += 1;
+                        bryter = 1;
+                        break;
+                    case 1:
+                        $('#' + div_id).append('<td style="text-align:center;"><a href="/enkelvareordre?ID='+div_id+'">' + div_id + '</a></td>');/*cell['ID']*/
+                        bryter = 2;
+                        $('#' + div_id).append('<td>' + cell + '</td>');  /*cell['Navn']*/
+                        break;
+                    case 2:
+                        $('#' + div_id).append('<td>' + cell + ',-</td>'); /*cell['Verdi']*/
+                        bryter = 3;
+                        break;
+                    case 3:
+                        $('#' + div_id).append('<td><button class="btn" '+
+                                                'onClick=showhideRow("'+div_id+'")>' + cell + 
+                                                ' <i class="fa fa-arrow-down" aria-hidden="true"></i>' +
+                                                '</button></td>'); /*cell['Varer']*/
+                        bryter = 4;
+                        break;
+                    case 4:
+                        dato_cell = formatTime(cell);
+                        $('#' + div_id).append('<td>' + dato_cell + '</td>'); /*cell['opprettet']*/
+                        bryter = 5;
+                        break;
+                    case 5:
+                        dato_cell = formatTime(cell);
+                        $('#' + div_id).append('<td>' + dato_cell + '</td>'); /*cell['sist oppdatert']*/
+                        bryter = 6;
+                        break;
+                    case 6:
+                        current = buttonArray[cell][0];
+
+                        if (current_user == 'admin' || cell == 'Bestilt' || cell == 'Mottatt' ) {
+                            $('#' + div_id).append('<td class="row" style="text-align:center;">'+
+                                                 '<button id="'+ div_id+'button" '+
+                                                 'style="margin:auto;" type="button" ' +
+                                                    'onClick="cloneButton(this.id)" ' + 
+                                                 'class="'+ current +'">'+ cell + '' +
+                                                 '</button></td>'); /*cell['STATUS']*/ 
+                        } else  {
+                            $('#' + div_id).append('<td class="row" style="text-align:center;">'+
+                                                 '<button id="'+ div_id+'button" '+
+                                                 'style="margin:auto;" type="button" ' +
+                                                 'class="'+ current +'">'+ cell + '' +
+                                                 '</button></td>'); /*cell['STATUS']*/ 
+                        };
+                        bryter = 0;
+                        break;
+                    };
+                };
+            };
+        };
+
+
+    /*SEARCH LOGIC*/
+    var searchLength = 0;
+
+    function searchForString(string){
+
+        $.getJSON('/searchvareordre?string=' + string , function(data) {
+
+            $("#ordretabell").empty();
+            searchLength = data.tabell.length;
+            resultString = "Viser " + searchLength + " ordre.";
+            $("#sokeresult").text(resultString);
+            populateOrdretabell(data.tabell);
+        });
+    };
 </script>
