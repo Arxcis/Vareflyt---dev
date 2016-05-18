@@ -18,6 +18,9 @@ a:hover {text-decoration: none; color: black;}
 /*---------- VARER - APP ------------ */
 /* ordre_liste.html */
 #nyvarebutton {background-color: #c0392b; color: #fff; margin-top: 10pt; margin-bottom: 20pt;}
+#sokeresult {margin-bottom: 20px;}
+.sorteringsknapper {display: flex; justify-content: space-around; margin-left: 50px;}
+.sorteringsknapper button {flex: 0 1 70px;}
 
 /* ordre_ny.html*/
 .eventlinje:hover {cursor: pointer;}
@@ -28,6 +31,7 @@ a:hover {text-decoration: none; color: black;}
 #varetabellkort {background-color: #fff; padding: 15px; border-radius: 15px;  box-shadow:5px 5px 5px 0px rgba(22,22,22,0.4); margin-top: 50px; margin-bottom: 50px;}
 #sokeresult  {background-color: #c0392b; color: #fff; text-align: right;}
 #sokeform {padding-bottom: 20pt;}
+.nykommentar {margin-top: 30px;}
 
 
 /* ordre_enkel.html*/

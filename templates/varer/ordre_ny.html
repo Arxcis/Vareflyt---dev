@@ -42,6 +42,12 @@
 
                     </select>
                 </div>
+
+        
+                <label class="col-md-1 control-label nykommentar" for="textinput">Kommentar</label>
+                <div class="col-md-10">
+                    <textarea rows="5" class="form-control nykommentar" id="inputkommentar"></textarea>
+                </div>
             </div>
         </form>
 
@@ -86,7 +92,7 @@
             <!-- Search input-->
             <label class="col-md-1 control-label" for="searchinput">Søk</label>
             <div id=sokeform class="col-md-5">
-                <input id="searchfield" name="searchvare" type="search" placeholder="Tekst" class="form-control input-md" onkeyup="searchForString(this.value)">
+                <input id="searchfield" name="searchvare" type="search" placeholder="Tekst" class="form-control input-md" onkeyup="generalSearch(this.value)">
                 
             </div>
             <div class="col-md-5">
@@ -139,24 +145,12 @@
 
 <script name="bestillingsscript" type="text/javascript" language="javascript">
 
+    var varetabell = {{ varetabell | safe }};
 
     function autofyllButikk(){
         document.getElementById("inputnavn").value = "Stereo butikk";
         document.getElementById("inputtelefon").value = "56333902";
         document.getElementById("inputmail").value = "post@stereomusikk.com";
-    }
-
-
-    var newArray = [];
-
-    function cleanArray(actual) {
-
-        for (i = 0; i < actual.length; i++) {
-            if (actual[i]) {
-              newArray.push(actual[i]);
-            }
-        }
-        return newArray;
     }
 
 
@@ -251,6 +245,7 @@
     var verdi_bestilling = '';
     var antall_bestilling = 0;
     var signatur_bestilling = '';
+    var kommentar_bestilling = '';
 
     function sendBestilling() {
 
@@ -258,11 +253,12 @@
         varer_bestilling = [];
         antall_bestilling = 0;
 
-        navn_bestiller = document.getElementById("inputnavn").value;
-        telefon_check = document.getElementById("inputtelefon").value;
-        signatur_bestilling = document.getElementById("inputsignatur").value;
-        kontakt_bestiller = document.getElementById("inputtelefon").value + ", " +
-                            document.getElementById("inputmail").value;
+        navn_bestiller = document.getElementById('inputnavn').value;
+        telefon_check = document.getElementById('inputtelefon').value;
+        signatur_bestilling = document.getElementById('inputsignatur').value;
+        kontakt_bestiller = document.getElementById('inputtelefon').value + ", " +
+                            document.getElementById('inputmail').value;
+        kommentar_bestilling = document.getElementById('inputkommentar').value;
         verdi_bestilling = total_verdi;
   
         for (key in bestillingslinjer) {
@@ -281,6 +277,16 @@
             return 0;
         } else {
 
+            var newArray = [];
+            function cleanArray(actual) {
+            /* Only sends array members that actually contain information*/
+                for (i = 0; i < actual.length; i++) {
+                    if (actual[i]) {
+                      newArray.push(actual[i]);
+                    }
+                }
+                return newArray;
+            }
             varer_bestilling = cleanArray(varer_bestilling);
 
             $.post("/postvareordre", {
@@ -289,11 +295,15 @@
                     'varer': String(varer_bestilling),
                     'verdi': String(verdi_bestilling),
                     'antall': String(antall_bestilling),
-                    'signatur': signatur_bestilling
+                    'signatur': signatur_bestilling,
+                    'kommentar': kommentar_bestilling
 
                 }, function(data){
-                    console.log("you recieved " + data.result);
-                    window.location.assign('/varer');
+                    if (data.result == 'success'){
+                        window.location.assign('/varer');
+                    } else {
+                        console.log(data.result);
+                    };
             });
         };
     };
@@ -387,6 +397,13 @@
     function populateVareliste(tabell) {
         /* The general function for displaying an array of cells
             as vareliste */
+        /* Prepare */
+        searchLength = tabell.length;
+        resultString = "Viser " + searchLength + " varer.";
+        $("#sokeresult").text(resultString);
+        $("#varetabell").empty();
+        /* ---------- */
+
         for (i=0; i < tabell.length; i++) {
             row = tabell[i];
 
@@ -434,10 +451,11 @@
     $(document).ready(function() {
 
         $.getJSON('/getvareutvalg?columns=' + varer_columns, function(data) {
+            
             populateVareliste(data.tabell);
         });
-    }); 
 
+    }); 
 
 
     var searchLength = 0;
@@ -447,11 +465,44 @@
         $.getJSON('/getvareutvalg?string=' + string , function(data) {
 
             $("#varetabell").empty();
-            searchLength = data.tabell.length;
-            resultString = "Viser " + searchLength + " varer.";
-            $("#sokeresult").text(resultString);
+            
             populateVareliste(data.tabell);
         });
     };
+
+
+    function generalSearch (sentence) {
+        /* A function that searches any column in a 2d-array
+          for any word in a string-sentence.*/
+        var kwords = sentence.split(' ');
+        var array = varetabell;
+        var kwordsLength = kwords.length;
+
+        var trimmedArray = [];
+        var wordsCorrect = 0;
+        var nextRow = false;
+
+        /*Loop through rows*/
+        for (i=0; i<array.length; i++){
+            var row = array[i].toString().toUpperCase();
+
+            for (j=0; j < kwordsLength; j++){
+                if (row.indexOf(kwords[j].toUpperCase()) > -1){
+                    wordsCorrect += 1;
+                };
+            };
+            console.log("Correct: " + wordsCorrect + '| kwordsLength: ' + kwordsLength)
+            if (wordsCorrect == kwordsLength){
+                trimmedArray.push(array[i]);
+
+            };
+            wordsCorrect = 0;
+        };
+
+        populateVareliste(trimmedArray);
+        /*return trimmmedArray;*/
+    };
+
+
 </script>
 

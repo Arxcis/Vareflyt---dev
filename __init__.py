@@ -6,6 +6,8 @@ from flask import Flask, session, render_template, \
 from functools import wraps
 import gc
 import os
+import json
+
 from SQLlikeaPig import MyPigFarm, MyPig
 
 app = Flask(__name__)
@@ -90,7 +92,7 @@ def varer():
 @login_required
 def service():
 
-    tabell = serviceordre.select([0,1,9,8,7], '', 'ID DESC')
+    tabell = serviceordre.select([0,1,9,8,7], '', 'ORDER BY ID DESC')
 
     return render_template('service/service_liste.html', tabell=tabell)
 
@@ -100,18 +102,16 @@ def service():
 def nyordre():
 
     pick = request.args.get('pick')
-
+    
     if pick == 'vare':
-        return render_template('/varer/ordre_ny.html')
+        varetabell = utvalg.select([1,7,4,5,11]) 
+        return render_template('/varer/ordre_ny.html', varetabell=json.dumps(varetabell))
 
     elif pick == 'service':
         return render_template('/service/service_ny.html')
 
     else: 
         return "WTF!"
-
-
-
 
 @app.route('/update')
 @login_required
@@ -194,11 +194,12 @@ def enkelservice():
 @app.route('/postvareordre', methods=["POST"])
 @login_required
 def lagre_vareordre():
+    try:
+        success = vareordre.lagre_vareordre(request.form)    
+        return jsonify(result=success)
 
-    success = vareordre.lagre_vareordre(request.form)    
-
-    return jsonify(result=success)
-
+    except Exception as e:
+        return jsonify(result="Server ERROR: " + str(e))
 
 @app.route('/getvareutvalg')
 def getvareutvalg():
@@ -232,10 +233,27 @@ def getvarelinje():
 def vareordre_liste():
 
     indexes = request.args.get('columns').split(',')
+    sql = "WHERE Status!='Levert' ORDER BY StatusNr, ID DESC"
 
-    ordre_array = vareordre.select(indexes, '', "StatusNr, ID DESC")
+    ordre_array = vareordre.select(indexes, '', sql)
     return jsonify(tabell=ordre_array)
 
+
+@app.route('/getsortedordre')
+def get_sortedordre():
+    try:
+        indexes = request.args.get('columns').split(',')
+        given_column = request.args.get('status')
+        sql = "WHERE Status='"+ given_column +"' ORDER BY sist_oppdatert"
+
+        if given_column == 'Levert':
+            sql += ' DESC'
+
+        vareordre_table = vareordre.select(indexes, '', sql)
+        return jsonify(tabell=vareordre_table)
+
+    except Exception as e:
+        return render_template('login.html', error = e)
 
 @app.route('/poststatus', methods=['POST'])
 @login_required
@@ -258,6 +276,8 @@ def search_vareordre():
 
     vareordre_table = vareordre.searchvareordre(request.args.get('string'))
     return jsonify(tabell=vareordre_table)
+
+
 
 # -------------------------------------------#
 """    ROUTES FRA varer/ordre_enkel.html   """
@@ -334,7 +354,7 @@ def update_service():
 def service_ordreliste():
     try:
         indexes = request.args.get('columns').split(',')
-        ordre_array = serviceordre.select(indexes, '', 'StatusNr, ID DESC')
+        ordre_array = serviceordre.select(indexes, '', 'ORDER BY StatusNr, ID DESC')
         return jsonify(tabell=ordre_array)
         
     except Exception as e:
@@ -373,4 +393,4 @@ def delete_service():
 
 
 if __name__ == "__main__":
-	app.run()
+    app.run()

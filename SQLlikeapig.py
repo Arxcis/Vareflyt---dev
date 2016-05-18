@@ -61,7 +61,7 @@ class MyPig:
 
     # ------------- GENERAL SQL-QUERY methods ---------------
 
-    def select(self, column_indexes, ID='', orderby=''):
+    def select(self, column_indexes, ID='', addon=''):
         """
         column_indexes = a list of column ints f.ex: [1,3,4,5,11]
         ID = a unique key to the row
@@ -83,15 +83,16 @@ class MyPig:
             column_string = ", ".join(selected)
         
         sql = "SELECT %s FROM %s" % (column_string, self.table)
+
         where = " WHERE ID='%s'" % ID
-        order = " WHERE status!='Levert' ORDER BY %s" % orderby
+        addon = " " + addon
 
         if ID != '':
             sql += where
             c.execute(sql)
             select_result = c.fetchone()
-        elif orderby != '':
-            sql += order
+        elif addon != '':
+            sql += addon
             c.execute(sql)
             select_result = c.fetchall()
         else:
@@ -151,15 +152,16 @@ class MyPig:
         c, conn = self.open()
 
         c.execute("INSERT INTO vareordre"
-                  "(Kundenavn, Kontakt, Varer, Verdi, Antall, Signatur, Ny, status) "
-                  "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', "
+                  "(Kundenavn, Kontakt, Varer, Verdi, Antall, Signatur, Notat, Ny, status) "
+                  "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', "
                   "CURRENT_TIMESTAMP(), 'Ny')"
                    % (ny_ordre['navn'],
                   ny_ordre['kontakt'],
                   ny_ordre['varer'],
                   ny_ordre['verdi'],
                   ny_ordre['antall'],
-                  ny_ordre['signatur']))
+                  ny_ordre['signatur'],
+                  ny_ordre['kommentar']))
 
         self.close(c, conn)
         return 'success'
