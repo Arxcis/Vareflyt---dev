@@ -47,7 +47,11 @@
 
             <label class="col-md-4 control-label" for="textarea">Kommentar butikk</label>
             <div class="col-md-10">                     
-                <textarea rows="6" class="form-control" id="notatbutikk" rowspan="3" name="notatbutikk">{{ notater[0] }}</textarea>
+                <textarea rows="6" class="form-control" 
+                    {% if session['brukernavn'] == 'admin' %} 
+                         readonly="readonly" style="background-color: #ffcccc;"
+                    {% endif %}
+                        id="notatbutikk" rowspan="3" name="notatbutikk">{{ notater[0] }}</textarea>
             </div>
             <label class="col-md-4 control-label" for="textarea">Kommentar admin</label>
             <div class="col-md-10">       
@@ -62,10 +66,10 @@
             <div id="buttons_enkelordre" class="col-md-12">
                     <button form="notisform" type="submit" name="submit" value="{{ bestid }}" class="btn btn-success">LAGRE</button>
 
-                {% if session['brukernavn'] == 'admin' %}
-                    <button class="btn btn-danger" onClick="deleteVareordre({{ bestid }})">SLETT</button>
+                {% if session['brukernavn'] == 'admin' and status != 'Kansellert' %}
+                    <button class="btn btn-default" onClick="kansellerVareordre({{ bestid }})">KANSELLER</button>
                 {% elif session['brukernavn'] == 'butikk' and status == 'Ny' %} 
-                    <button class="btn btn-danger" onClick="deleteVareordre({{ bestid }})">SLETT</button>
+                    <button class="btn btn-default" onClick="kansellerVareordre({{ bestid }})">KANSELLER</button>
                 {% endif %}
             </div>
         </form>
@@ -74,12 +78,16 @@
 
 <script type="text/javascript">
 
-    var selected_bestID = '';
+    var current_user = '{{ session["brukernavn"] }}'
+    var opposite_user = {
+        'admin': 'butikk',
+        'butikk': 'admin'
+    }
 
-    function deleteVareordre(id) {
-        selected_bestID = String(id).split("del")[0];
-        $.getJSON('/postdeleteordre?ID='+selected_bestID, function(data){
-            console.log("You recieved " + data.result)
+    function kansellerVareordre(ID) {
+
+        $.post('/postkanseller',{ 'ID': ID, 'ulest': opposite_user[current_user] }, function(data){
+
             if (data.result === 'success') {
                 window.location.replace('/varer');
             };

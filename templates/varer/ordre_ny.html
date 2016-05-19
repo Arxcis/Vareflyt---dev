@@ -92,7 +92,7 @@
             <!-- Search input-->
             <label class="col-md-1 control-label" for="searchinput">Søk</label>
             <div id=sokeform class="col-md-5">
-                <input id="searchfield" name="searchvare" type="search" placeholder="Tekst" class="form-control input-md" onkeyup="generalSearch(this.value)">
+                <input id="searchfield" name="searchvare" type="search" placeholder="Tekst" class="form-control input-md" onkeyup="vareSearch(varetabell, this.value)">
                 
             </div>
             <div class="col-md-5">
@@ -145,7 +145,23 @@
 
 <script name="bestillingsscript" type="text/javascript" language="javascript">
 
+    // The rows that are imported from varer(MySQLtable) are: 1,7,4,5,11
+        /*
+            1 = ID
+            7 = varegruppe
+            4 = Merke
+            5 = Modell
+            11 = Utsalgspris
+    ---------------------------------------------------------------------------*/
     var varetabell = {{ varetabell | safe }};
+    
+    /* Mulig sikkerhetshull under - undersøk*/
+    var current_user = '{{ session["brukernavn"] }}'
+    var opposite_user = {
+        'admin': 'butikk',
+        'butikk': 'admin'
+    }
+
 
     function autofyllButikk(){
         document.getElementById("inputnavn").value = "Stereo butikk";
@@ -296,8 +312,8 @@
                     'verdi': String(verdi_bestilling),
                     'antall': String(antall_bestilling),
                     'signatur': signatur_bestilling,
-                    'kommentar': kommentar_bestilling
-
+                    'kommentar': kommentar_bestilling,
+                    'ulest': opposite_user[current_user]
                 }, function(data){
                     if (data.result == 'success'){
                         window.location.assign('/varer');
@@ -450,59 +466,13 @@
 
     $(document).ready(function() {
 
-        $.getJSON('/getvareutvalg?columns=' + varer_columns, function(data) {
-            
-            populateVareliste(data.tabell);
-        });
+            populateVareliste(varetabell);
+ 
+    });
 
-    }); 
-
-
-    var searchLength = 0;
-
-    function searchForString(string){
-
-        $.getJSON('/getvareutvalg?string=' + string , function(data) {
-
-            $("#varetabell").empty();
-            
-            populateVareliste(data.tabell);
-        });
-    };
-
-
-    function generalSearch (sentence) {
-        /* A function that searches any column in a 2d-array
-          for any word in a string-sentence.*/
-        var kwords = sentence.split(' ');
-        var array = varetabell;
-        var kwordsLength = kwords.length;
-
-        var trimmedArray = [];
-        var wordsCorrect = 0;
-        var nextRow = false;
-
-        /*Loop through rows*/
-        for (i=0; i<array.length; i++){
-            var row = array[i].toString().toUpperCase();
-
-            for (j=0; j < kwordsLength; j++){
-                if (row.indexOf(kwords[j].toUpperCase()) > -1){
-                    wordsCorrect += 1;
-                };
-            };
-            console.log("Correct: " + wordsCorrect + '| kwordsLength: ' + kwordsLength)
-            if (wordsCorrect == kwordsLength){
-                trimmedArray.push(array[i]);
-
-            };
-            wordsCorrect = 0;
-        };
-
-        populateVareliste(trimmedArray);
-        /*return trimmmedArray;*/
-    };
-
+    function vareSearch(varer, sentence){
+        populateVareliste(generalSearch(varer, sentence));
+    }
 
 </script>
 

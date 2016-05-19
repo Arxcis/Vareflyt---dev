@@ -7,6 +7,7 @@ from functools import wraps
 import gc
 import os
 import json
+from bson import json_util
 
 from SQLlikeaPig import MyPigFarm, MyPig
 
@@ -84,8 +85,9 @@ def login():
 @app.route('/varer')
 @login_required
 def varer():
-
-    return render_template('/varer/ordre_liste.html')
+    ordtabell = vareordre.select([0,1,5,4,7,6,11,12,16], '', "ORDER BY StatusNr, ID DESC");
+    return render_template('/varer/ordre_liste.html', 
+                            tabell=json.dumps(ordtabell, default=json_util.default))
 
 
 @app.route('/service')
@@ -201,19 +203,6 @@ def lagre_vareordre():
     except Exception as e:
         return jsonify(result="Server ERROR: " + str(e))
 
-@app.route('/getvareutvalg')
-def getvareutvalg():
-
-    if request.args.get('columns'):
-        indexes = request.args.get('columns').split(',')
-        table_array = utvalg.select(indexes)
-
-    elif request.args.get('string') or request.args.get('string') == '':
-        now_string = request.args.get('string')
-        table_array = utvalg.searchtable(now_string)
-    
-    return jsonify(tabell=table_array)
-
 
 @app.route('/getvarelinje')
 def getvarelinje():
@@ -229,31 +218,6 @@ def getvarelinje():
 """    ROUTES FRA varer/ordre_liste.html   """
 # -------------------------------------------#
 
-@app.route('/getvareordreliste')
-def vareordre_liste():
-
-    indexes = request.args.get('columns').split(',')
-    sql = "WHERE Status!='Levert' ORDER BY StatusNr, ID DESC"
-
-    ordre_array = vareordre.select(indexes, '', sql)
-    return jsonify(tabell=ordre_array)
-
-
-@app.route('/getsortedordre')
-def get_sortedordre():
-    try:
-        indexes = request.args.get('columns').split(',')
-        given_column = request.args.get('status')
-        sql = "WHERE Status='"+ given_column +"' ORDER BY sist_oppdatert"
-
-        if given_column == 'Levert':
-            sql += ' DESC'
-
-        vareordre_table = vareordre.select(indexes, '', sql)
-        return jsonify(tabell=vareordre_table)
-
-    except Exception as e:
-        return render_template('login.html', error = e)
 
 @app.route('/poststatus', methods=['POST'])
 @login_required
@@ -261,21 +225,29 @@ def lagre_status():
 
     nystatus = request.form['status']
     ordre_id = request.form['id']
+    ulest = request.form['ulest']
     try:
-        success = vareordre.rowupdate(['status', nystatus, 'StatusNr'],
-                                 [nystatus, 'CURRENT_TIMESTAMP()', statusdict[nystatus]],
+        success = vareordre.rowupdate(['status', nystatus, 'StatusNr', 'Ulest'],
+                                 [nystatus, 'CURRENT_TIMESTAMP()', statusdict[nystatus], ulest],
                                  ordre_id)
         return jsonify(result=success)
 
     except Exception as e:
         return jsonify(result= "Server ERROR: " + str(e))
 
+@app.route('/markasread', methods=['POST'])
+@login_required
+def markas_read():
 
-@app.route('/searchvareordre')
-def search_vareordre():
+    try:
+        ordre_id = request.form['id']
+        lest = request.form['lest']
 
-    vareordre_table = vareordre.searchvareordre(request.args.get('string'))
-    return jsonify(tabell=vareordre_table)
+        success = vareordre.rowupdate(['Ulest'], [lest], ordre_id)
+        return jsonify(result=success)
+
+    except Exception as e:
+        return jsonify(result= "Server ERROR: " + str(e))
 
 
 
@@ -283,16 +255,19 @@ def search_vareordre():
 """    ROUTES FRA varer/ordre_enkel.html   """
 # -------------------------------------------#
 
-@app.route('/postdeleteordre')
+@app.route('/postkanseller', methods=['POST'])
 @login_required
-def delete_ordre():
+def kanseller():
     try:
-        ordre_id = request.args.get('ID')
-        success = vareordre.delete_vareordre(ordre_id)
-        return jsonify(result = str(success))
+        ordre_id = request.form['ID']
+        ulest = request.form['ulest']
+        success = vareordre.rowupdate(['status', 'StatusNr', 'Ulest'], 
+                                      ['Kansellert', '5', ulest], 
+                                       ordre_id)
+        return jsonify(result=str(success))
 
     except Exception as e:
-        return render_template('login.html', error = e)
+        return jsonify(result=e)
 
 
 @app.route('/postnotater', methods=['POST'])
@@ -307,11 +282,11 @@ def post_notater():
 
         if request.form['notatbutikk']:
             notat1 = request.form['notatbutikk']
-            vareordre.rowupdate(['Notat'], [notat1], ordre_id)
+            vareordre.rowupdate(['Notat', 'Ulest'], [notat1, 'admin'], ordre_id)
 
         if request.form['notatadmin']:
             notat2 = request.form['notatadmin']
-            vareordre.rowupdate(['NotatAdmin'], [notat2], ordre_id)
+            vareordre.rowupdate(['NotatAdmin','Ulest'], [notat2, 'butikk'], ordre_id)
 
         return redirect('/varer')
 

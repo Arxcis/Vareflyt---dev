@@ -124,36 +124,12 @@ class MyPig:
 
     # ------ SPECIAL METHODS -> varer/ordre_ny.html ----
 
-    def searchtable(self, string):
-        c, conn = self.open()
-
-        c.execute("SELECT ID, Varegruppe, Merke, Modell, Utsalgspris "
-                  "FROM varer WHERE CONCAT_WS"
-                  "('', ID, Varegruppe, Merke, Modell, Utsalgspris) "
-                  "LIKE '%" + string + "%'")
-        array = c.fetchall()
-
-        self.close(c, conn)
-        return array
-
-    def searchvareordre(self, string):
-        c, conn = self.open()
-
-        c.execute("SELECT ID, Kundenavn, Verdi, Antall, Ny, sist_oppdatert, status "
-                  "FROM vareordre WHERE Kundenavn "
-                  "LIKE '%" + string + "%' "
-                  "ORDER BY StatusNr, ID DESC")
-        array = c.fetchall()
-
-        self.close(c, conn)
-        return array
-
     def lagre_vareordre(self, ny_ordre):
         c, conn = self.open()
 
         c.execute("INSERT INTO vareordre"
-                  "(Kundenavn, Kontakt, Varer, Verdi, Antall, Signatur, Notat, Ny, status) "
-                  "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', "
+                  "(Kundenavn, Kontakt, Varer, Verdi, Antall, Signatur, Notat, Ulest, Ny, status) "
+                  "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', "
                   "CURRENT_TIMESTAMP(), 'Ny')"
                    % (ny_ordre['navn'],
                   ny_ordre['kontakt'],
@@ -161,7 +137,8 @@ class MyPig:
                   ny_ordre['verdi'],
                   ny_ordre['antall'],
                   ny_ordre['signatur'],
-                  ny_ordre['kommentar']))
+                  ny_ordre['kommentar'],
+                  ny_ordre['ulest']))
 
         self.close(c, conn)
         return 'success'
@@ -199,7 +176,7 @@ class MyPig:
 
     # ------ SPECIAL METHODS -> varer/ordre_enkel.html ----
 
-    def delete_vareordre(self, rowid):
+    def kans_vareordre(self, rowid):
         c, conn = self.open()
 
         c.execute("DELETE FROM vareordre WHERE ID=%s" % rowid)

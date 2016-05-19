@@ -10,18 +10,24 @@
         </button>  
     </form>
 
-    <label class="col-md-1 control-label" for="searchinput">Søk</label>
-    <div id=sokeform class="col-md-4">
-        <input id="sokefelt" name="searchvare" type="search" placeholder="Navn" class="form-control input-md" onkeyup="searchForString(this.value)">
+    <div class="col-md-11">
+        <div class="sorteringsknapper">
+            <button id="homebtn" class="btn" name="Ulest">Ulest</button>
+            <button class="btn btn-primary" name="Alle">Alle</button>
+            <button class="btn btn-danger" name="Ny">Ny</button>
+            <button class="btn btn-warning" name="Bestilt">Bestilt</button>
+            <button class="btn btn-info" name="Mottatt">Mottatt</button>
+            <button class="btn btn-success" name="Levert">Levert</button>
+            <button class="btn btn-default" name="Kansellert">Kansellert</button>
+        </div>
     </div>
-    <div class="col-md-1">
-        <button id="sokeresult" class=" btn"></button>
-    </div>
-    <div class="col-md-5 sorteringsknapper">
-        <button class="btn btn-danger" name="Ny">Ny</button>
-        <button class="btn btn-warning" name="Bestilt">Bestilt</button>
-        <button class="btn btn-info" name="Mottatt">Mottatt</button>
-        <button class="btn btn-success" name="Levert">Levert</button>
+
+    <div id=sokeform class="col-md-11">
+        <label class="col-md-1 control-label" for="searchinput">Søk</label>
+        <div class="col-md-6">
+            <input id="sokefelt" name="searchvare" type="search" placeholder="Navn" class="form-control input-md" onkeyup="searchOrdreliste(this.value)">
+        </div>
+        <button id="sokeresult" class="btn"></button>
     </div>
 
     <section id="ordretabellkort" class="col-md-12">
@@ -54,56 +60,29 @@
 
 
 <script>
+	
+	// The rows that are imported from vareordre(MySQLtable) are: 0,1,5,4,7,6,11,12,16
+		/*
+			0 = ID
+			1 = Kundenavn
+			5 = Verdi
+			4 = Antall
+			7 = Ny
+			6 = sist_oppdatert
+			11 = status
+			12 = StatusNr
+			16 = Ulest       
+	---------------------------------------------------------------------------*/
+    var vareordretabell = {{ tabell | safe }};
 
+    /* Mulig sikkerhetshull under - undersøk*/
+    var current_user = '{{ session["brukernavn"] }}'
+    var opposite_user = {
+    	'admin': 'butikk',
+    	'butikk': 'admin'
+    }
 
-    var datetime = '';
-    var dateint = 0; 
-    var resultstring = '';
-
-
-    function formatTime(datetime){
-        datetime = datetime.split(":").join(" ");
-        datetime = datetime.split(" ");
-
-        result = datetime[1]+ ' ' + datetime[2]+ ' ' +datetime[3]+ ' - ' +datetime[4]+ ':' +datetime[5];
-        return result;
-    };  
-
-
-    /* HIDDEN ROW LOGIC*/
-    var enkelrow;
-    var openRows = 0;
-    var hide_orShow = '';
-
-    function structHiddenrow(ID) {
-
-        function voidStructure() {
-            /*Create the hidden row structure.*/
-            $('#ordretabell').append('<tr id="hidden'+ID+'" class="collapse '+hide_orShow+'">'+
-                                    '<td colspan=3>'+
-                                    '<div id="hidden1'+ID+'" style="display:flex; flex-direction: column; align-items: center;"></div>'+
-                                    '</td>'+
-                                    '<td colspan=4>' +
-                                    '<div id="hidden2'+ID+'" style="display:flex; flex-direction: column; align-items:flex-start;"></div>' +
-                                    '</td>' +
-                                    '</tr>');
-
-        };
-
-        if (openRows < 2) {
-            hide_orShow = 'in';
-            voidStructure();
-            populateHiddenrow(ID);
-            openRows += 1;
-        } else if (openRows == 2) {
-            hide_orShow = 'out';
-            voidStructure();
-        } else {
-            voidStructure();
-        };
-
-    };
-
+    /* ----------------- HIDDEN ROW CLASS --------------------------------------------*/
 
     function populateHiddenrow(ID) {
         /*Fill the structure with relevant data when row is displayed.*/
@@ -135,6 +114,40 @@
     };
 
 
+    var enkelrow;
+    var openRows = 0;
+    var maxopenRows = 0;
+    var hide_orShow = 'in';
+
+    function structHiddenrow(ID) {
+
+        function voidStructure() {
+            /*Create the hidden row structure.*/
+            $('#ordretabell').append('<tr id="hidden'+ID+'" class="collapse '+hide_orShow+'">'+
+                                    '<td colspan=3>'+
+                                    '<div id="hidden1'+ID+'" class="hiddenblock" style="display:flex; flex-direction: column; align-items: center;"></div>'+
+                                    '</td>'+
+                                    '<td colspan=4>' +
+                                    '<div id="hidden2'+ID+'" class="hiddenblock" style="display:flex; flex-direction: column; align-items:flex-start;"></div>' +
+                                    '</td>' +
+                                    '</tr>');
+
+        };
+
+        if (openRows < maxopenRows) {
+            voidStructure();
+            populateHiddenrow(ID);
+            openRows += 1;
+        } else if (openRows == maxopenRows) {
+            hide_orShow = 'out';
+            voidStructure();
+        } else {
+            voidStructure();
+        };
+
+    };
+
+
     function showhideRow(ID) {
         var hiddenID = '#hidden'+ID;
         if($(hiddenID).hasClass("out")) {
@@ -147,13 +160,25 @@
             $('#hidden2'+ID).empty();
             $(hiddenID).addClass("out");
             $(hiddenID).removeClass("in");
+
+            /* Merk ordren som lest dersom riktig bruker.*/
+            var status_lest = (generalSearch(vareordretabell, ID, 0, true))[0][8];
+            //console.log(ID + '---> ' + status_lest+ ' == ' + current_user);
+            if (status_lest === current_user) {
+
+                $.post('/markasread', {'id': ID, 'lest': 'lest'}, function(data){
+
+                    console.log(data.result + ' Vareordren er lest av: ' + current_user);
+                    window.location.replace('/varer');
+
+                });
+            };
         };
 
     };
+    /* --------------------------------------------------------------------------------*/
 
-
-    /* BUTTON LOGIC */
-    var current_user = '{{ session["brukernavn"] }}'
+	/* ---------------------------  BUTTON LOGIC CLASS ------------------------------- */
 
     var new_button = '';
     var old_button = '';
@@ -161,13 +186,14 @@
     var buttonArray = {'Ny': ['btn btn-danger', 'btn btn-warning', 'Bestilt'],
               'Bestilt': ['btn btn-warning','btn btn-info', 'Mottatt'],
               'Mottatt': ['btn btn-info', 'btn btn-success', 'Levert'],
-              'Levert' : ['btn btn-success'] 
+              'Levert' : ['btn btn-success'],
+              'Kansellert' : ['btn btn-default'] 
             }
 
     function cloneButton(buttonID) {
         old_button = $('#'+buttonID);
 
-        if (old_button.text() != 'Levert') {
+        if (old_button.text() != 'Levert' && old_button.text() != 'Kansellert') {
             button_parent = $('#'+buttonID).parent();
             new_button = $('#'+buttonID).clone();
             new_button.empty();
@@ -183,11 +209,11 @@
         } 
     };
 
-
     var final_button = '';
     var newID = '';
     var new_status = '';
     var bestillingID = '';
+
 
     function changeStatus(buttonID){
         final_button = $('#' + buttonID);
@@ -198,7 +224,8 @@
 
             $.post('/poststatus', {
                 'status': String(new_status),
-                'id': String(bestillingID)
+                'id': String(bestillingID),
+                'ulest': opposite_user[current_user]
                 }, function(data){
 
                 if (data.result === 'success') {
@@ -215,10 +242,11 @@
             final_button.siblings().remove();
             final_button.attr('onClick', 'cloneButton(this.id)');
         };      
-    };
+	};
+	/*------------------------------------------------------------------------------*/
 
+    /*---------------------------- MAIN TABLE CLASS -------------------------------*/
 
-    /* MAIN TABLE FUNCTION*/
     var bryter = 0;
     var div_id = '';
     var row_count = 0;
@@ -233,7 +261,7 @@
         for (i=0; i < tabell.length; i++) {
             row = tabell[i];
 
-            for (j=0; j < row.length; j++){
+            for (j=0; j < row.length-2; j++){
                 cell = row[j];
 
                 switch(bryter) {
@@ -242,7 +270,7 @@
                         div_id = $.trim(div_id);
                         $('#ordretabell').append('<tr id="' + div_id + '"></tr>');
                         structHiddenrow(div_id);
-                    
+
                         /* ON/OFF SWITCHBOX for the row background color*/ 
                         if (row_count % 2 === 0){
                             row_color = '#ffffff';
@@ -258,7 +286,7 @@
                         bryter = 1;
                         break;
                     case 1:
-                        $('#' + div_id).append('<td style="text-align:center;"><a href="/enkelvareordre?ID='+div_id+'">' + div_id + '</a></td>');/*cell['ID']*/
+                        $('#' + div_id).append('<td class="enkellink"><a href="/enkelvareordre?ID='+div_id+'">' + div_id + '</a></td>');/*cell['ID']*/
                         bryter = 2;
                         $('#' + div_id).append('<td>' + cell + '</td>');  /*cell['Navn']*/
                         break;
@@ -309,21 +337,16 @@
 
     var best_columns = '0,1,5,4,7,6,11';
 
-    /*SEARCH LOGIC*/
-    var searchLength = 0;
-
-    function searchForString(string){
-        $.getJSON('/searchvareordre?string=' + string , function(data) {
-            updateTabell(data.tabell, false);
-        });
-    };
-
-    function updateTabell(tabell, open=true){
-
-        if (open) {
-            openRows = 0;
+    function updateTabell(tabell, maxopen=false){
+    	/* Hjelpefunksjon til populateOrdretabell
+    	   input er et symmetrisk 2d-array + en int maxopen
+    	    som bestemmer hvor mange rader som skal vise sitt 
+    	     skjulte innhold.*/
+        openRows = 0;
+        maxopenRows = 0;
+        if (maxopen) {
+            maxopenRows = maxopen;
         };
-
         resultString = "Viser " + tabell.length + " ordre.";
         $("#sokeresult").text(resultString);
 
@@ -331,36 +354,69 @@
         populateOrdretabell(tabell);
     };
 
-    /* INIT - FUNCTION */
+    /* ---------------------- SEARCH LOGIC ----------------------------------*/
+    var searchLength = 0;
+
+    function searchOrdreliste(string){
+            updateTabell(generalSearch(vareordretabell, string));
+    };
+
+    /*---------------------------- INIT - CLASS ----------------------------------- */
+
+
     $(document).ready(function() {
 
+        function showUnreadRows(){
+        	unreadRows = generalSearch(vareordretabell, current_user, 8)
 
-        function showAllrows(){/* Get entire ordreliste without levert*/
-            $.getJSON('/getvareordreliste?columns='+ best_columns, function(data) {
-              updateTabell(data.tabell);
-            });
-            document.getElementById('sokefelt').value = '';
-        }
+            if (unreadRows.length > 0) {
+                updateTabell(unreadRows, unreadRows.length);
+            } else {
+                updateTabell(unreadRows);
+                $('#ordretabell').append('<tr><td class="emptymessage" colspan="7"><p>'+current_user+' har ingen uleste endringer.</p></td></tr>');
+            };
+        
+        };
 
-        showAllrows();
+        function showAllRows(){
+        	updateTabell(vareordretabell);
+        };
 
         $("#sokeresult").click(function(){
-            showAllrows();
+            showAllRows();
         });
 
-        /* Get ordreliste with specific status */
-        $(".sorteringsknapper").children().click(function(){
+        
+        $('.sorteringsknapper').children().click(function(){
+        	/* Get ordreliste with specific status when button clicked */
             status = $(this).attr('name');
-            $.getJSON('/getsortedordre?columns='+best_columns+'&status='+ status, function(data){
-                
+            
+            
+            if (status != 'Alle' && status != 'Ulest'){
+                var ordretabell_mod = deepCopy(vareordretabell);
+                ordretabell_mod = sortbyDate(ordretabell_mod, 5);
+                ordretabell_mod = generalSearch(ordretabell_mod, status, 6);
+
                 if (status == 'Levert') {
-                    updateTabell(data.tabell, false);
+                    updateTabell(ordretabell_mod);
                 } else {
-                    updateTabell(data.tabell);
+                    updateTabell(ordretabell_mod)};
+            } else {
+                switch(status){
+                    case 'Alle':
+                        updateTabell(vareordretabell);
+                        break;
+                    case 'Ulest':
+                        window.location.replace('/varer');
                 };
-            });
+                
+            };
         });
+
+
+    	// This line starts the show.
+    	showUnreadRows();
     });
 
-
+    /* ---------------------------------------------------------------------------*/
 </script>
