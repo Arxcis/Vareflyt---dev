@@ -19,14 +19,17 @@ a:hover {text-decoration: none; color: black;}
 /* ordre_liste.html */
 #nyvarebutton {background-color: #c0392b; color: #fff; margin-top: 10pt; margin-bottom: 20pt;}
 #sokeform {margin: 45px 0px 0px 50px; }
-#sokeresult {margin-bottom: 20px;}
+#sokeresult {margin-bottom: 20px; font-size: 17px;}
 .sorteringsknapper {display: flex; justify-content: space-between; margin: 20px 0px 0px 40px;}
-.sorteringsknapper button {flex: 0 1 60px;}
+.sorteringsknapper button {flex: 0 1 60px; font-size: 16px;}
 .enkellink {text-align: center;}
 .enkellink:hover {border-left: 3px solid #0066ff;}
 .emptymessage {height: 300px; background-color: #a6a6a6; text-align: center;}
 .emptymessage p {margin-top: 120px; font-size: 40px; color: #8c8c8c;}
 #homebtn {background-color: #cc0099; color: #fff;}
+#tabelloverskrift {display: flex;}
+#tabelloverskrift h3 {flex: 0 1 100px; padding-right: 10px;}
+#statuspoint {border-radius: 50%; width: 20px; height: 20px; align-self: center; margin: 10px 0px 0px 0px;}
 
 /* ordre_ny.html*/
 .eventlinje:hover {cursor: pointer;}

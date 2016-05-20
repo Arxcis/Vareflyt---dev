@@ -25,15 +25,16 @@
     <div id=sokeform class="col-md-11">
         <label class="col-md-1 control-label" for="searchinput">Søk</label>
         <div class="col-md-6">
-            <input id="sokefelt" name="searchvare" type="search" placeholder="Navn" class="form-control input-md" onkeyup="searchOrdreliste(this.value)">
+            <input id="sokefelt" name="searchvare" type="search" placeholder="OrdreID / Kunde / Verdi / Status / Kontaktinfo / Signatur / Kommentarer" class="form-control input-md" onkeyup="searchOrdreliste(this.value)">
         </div>
         <button id="sokeresult" class="btn"></button>
     </div>
 
     <section id="ordretabellkort" class="col-md-12">
 
-        <h3>Vareordre</h3>
-
+    	<div id="tabelloverskrift">
+        	<h3>Vareordre</h3>
+    	</div>
         <table class="table table-bordered table-striped">
             <thead>
                 <tr style="background-color: #c0392b; color: #fff">
@@ -61,8 +62,8 @@
 
 <script>
 	
-	// The rows that are imported from vareordre(MySQLtable) are: 0,1,5,4,7,6,11,12,16
-		/*
+	// The rows that are imported from vareordre(MySQLtable) are: 0,1,5,4,7,6,11,12,16,2,15
+		/* ------------------
 			0 = ID
 			1 = Kundenavn
 			5 = Verdi
@@ -71,7 +72,13 @@
 			6 = sist_oppdatert
 			11 = status
 			12 = StatusNr
-			16 = Ulest       
+			16 = Ulest
+			2 = Kontakt
+			15 = Signatur
+			13 = Notat
+			14 = NotatAdmin
+		/* -------------------
+			TOTAL 13 columns
 	---------------------------------------------------------------------------*/
     var vareordretabell = {{ tabell | safe }};
 
@@ -110,6 +117,11 @@
                 $('#hidden1'+ID).append('<p></p>');
                 $('#hidden2'+ID).append('<p>Admin: '+data.notater[1]+'</p>');
             };
+
+            var vitalInfo = generalSearch(vareordretabell, ID, 0, true)[0].slice(9,11);
+            //console.log(vitalInfo);
+            $('#hidden2'+ID).append('<p>Kundekontakt: '+ vitalInfo[0] +'</p>' +
+            						'<p>Signatur: '+ vitalInfo[1] + '</p>');
         });
     };
 
@@ -134,6 +146,9 @@
 
         };
 
+        openRows = 0;
+        hide_orShow = 'in';
+
         if (openRows < maxopenRows) {
             voidStructure();
             populateHiddenrow(ID);
@@ -156,8 +171,8 @@
             $(hiddenID).removeClass("out");
             
         } else {
-            $('#hidden1'+ID).empty();
-            $('#hidden2'+ID).empty();
+            document.getElementById('hidden1'+ID).innerHTML = '';
+            document.getElementById('hidden2'+ID).innerHTML = '';
             $(hiddenID).addClass("out");
             $(hiddenID).removeClass("in");
 
@@ -168,9 +183,8 @@
 
                 $.post('/markasread', {'id': ID, 'lest': 'lest'}, function(data){
 
-                    console.log(data.result + ' Vareordren er lest av: ' + current_user);
+                    //console.log(data.result + ' Vareordren er lest av: ' + current_user);
                     window.location.replace('/varer');
-
                 });
             };
         };
@@ -190,6 +204,11 @@
               'Kansellert' : ['btn btn-default'] 
             }
 
+    var final_button = '';
+    var newID = '';
+    var new_status = '';
+    var bestillingID = '';
+
     function cloneButton(buttonID) {
         old_button = $('#'+buttonID);
 
@@ -208,12 +227,6 @@
             return 0;
         } 
     };
-
-    var final_button = '';
-    var newID = '';
-    var new_status = '';
-    var bestillingID = '';
-
 
     function changeStatus(buttonID){
         final_button = $('#' + buttonID);
@@ -247,6 +260,7 @@
 
     /*---------------------------- MAIN TABLE CLASS -------------------------------*/
 
+
     var bryter = 0;
     var div_id = '';
     var row_count = 0;
@@ -255,13 +269,16 @@
     var cell = '';
     var dato_cell = '';
 
+    var best_columns = '0,1,5,4,7,6,11';
+
     function populateOrdretabell(tabell) {
         /* The general function for displaying an array of cells
             as vareliste and bestillingsliste */
         for (i=0; i < tabell.length; i++) {
             row = tabell[i];
 
-            for (j=0; j < row.length-2; j++){
+            for (j=0; j < 7; j++){
+            	// The number 7 is important. It decides how many columns i displayed.
                 cell = row[j];
 
                 switch(bryter) {
@@ -335,18 +352,20 @@
             };
         };
 
-    var best_columns = '0,1,5,4,7,6,11';
 
     function updateTabell(tabell, maxopen=false){
     	/* Hjelpefunksjon til populateOrdretabell
     	   input er et symmetrisk 2d-array + en int maxopen
     	    som bestemmer hvor mange rader som skal vise sitt 
     	     skjulte innhold.*/
-        openRows = 0;
+
         maxopenRows = 0;
         if (maxopen) {
             maxopenRows = maxopen;
+        } else if (tabell.length == 1) {
+       		maxopenRows = 1;
         };
+
         resultString = "Viser " + tabell.length + " ordre.";
         $("#sokeresult").text(resultString);
 
@@ -358,10 +377,22 @@
     var searchLength = 0;
 
     function searchOrdreliste(string){
-            updateTabell(generalSearch(vareordretabell, string));
+    	searchedTabell = generalSearch(vareordretabell, string);
+    	updateTabell(searchedTabell);
+        setPointcolor(btncolors['Alle']);
     };
 
     /*---------------------------- INIT - CLASS ----------------------------------- */
+
+    var btncolors = {
+    	'Ulest' : '#cc0099',
+    	'Alle' : '#006dcc',
+    	'Ny'  : '#d43f3a',
+    	'Bestilt' : '#eea236',
+    	'Mottatt' : '#46b8da',
+    	'Levert' : '#4cae4c',
+    	'Kansellert' : '#fff'
+    };
 
 
     $(document).ready(function() {
@@ -390,32 +421,32 @@
         $('.sorteringsknapper').children().click(function(){
         	/* Get ordreliste with specific status when button clicked */
             status = $(this).attr('name');
-            
-            
-            if (status != 'Alle' && status != 'Ulest'){
-                var ordretabell_mod = deepCopy(vareordretabell);
-                ordretabell_mod = sortbyDate(ordretabell_mod, 5);
-                ordretabell_mod = generalSearch(ordretabell_mod, status, 6);
-
-                if (status == 'Levert') {
-                    updateTabell(ordretabell_mod);
-                } else {
-                    updateTabell(ordretabell_mod)};
-            } else {
-                switch(status){
-                    case 'Alle':
-                        updateTabell(vareordretabell);
-                        break;
-                    case 'Ulest':
-                        window.location.replace('/varer');
-                };
-                
+           	setPointcolor(btncolors[status]);
+            switch(status){
+            	case 'Ny': case 'Bestilt': case 'Mottatt': case 'Levert': case 'Kansellert':
+            		var ordretabell_mod = deepCopy(vareordretabell);
+           	 		ordretabell_mod = sortbyDate(ordretabell_mod, 5);
+            		ordretabell_mod = generalSearch(ordretabell_mod, status, 6);
+            		updateTabell(ordretabell_mod);
+            		break;
+                case 'Alle':
+                    updateTabell(vareordretabell);
+                    break;
+                case 'Ulest':
+                    window.location.replace('/varer');
+                    break;
+                default:
+                	console.log("Something is wrong you moron!");
+                	break;
             };
+
         });
 
 
     	// This line starts the show.
     	showUnreadRows();
+    	$('#tabelloverskrift').append('<p id="statuspoint"></p>');
+    	setPointcolor(btncolors['Ulest']);
     });
 
     /* ---------------------------------------------------------------------------*/

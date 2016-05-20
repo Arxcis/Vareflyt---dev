@@ -112,4 +112,6 @@ function deepCopy(oldValue) {
   return newValue = JSON.parse(strValue)
 }
 
-
+function setPointcolor(color){
+    $('#statuspoint').css('background-color', color);
+};

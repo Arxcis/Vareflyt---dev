@@ -85,7 +85,7 @@ def login():
 @app.route('/varer')
 @login_required
 def varer():
-    ordtabell = vareordre.select([0,1,5,4,7,6,11,12,16], '', "ORDER BY StatusNr, ID DESC");
+    ordtabell = vareordre.select([0,1,5,4,7,6,11,12,16,2,15,13,14], '', "ORDER BY StatusNr, ID DESC");
     return render_template('/varer/ordre_liste.html', 
                             tabell=json.dumps(ordtabell, default=json_util.default))
 
